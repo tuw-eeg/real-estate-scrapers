@@ -1,0 +1,30 @@
+fail_fast: true
+repos:
+  - repo: local
+    hooks:
+      - id: system
+        name: ⚫️ Black (format code)
+        entry: poetry run black .
+        pass_filenames: false
+        language: system
+  - repo: local
+    hooks:
+      - id: system
+        name: 🧩 isort (sort imports)
+        entry: poetry run isort .
+        pass_filenames: false
+        language: system
+  - repo: local
+    hooks:
+      - id: system
+        name: 🎯 MyPy (static type checks)
+        entry: poetry run mypy
+        pass_filenames: false
+        language: system
+  - repo: local
+    hooks:
+      - id: system
+        name: 🎖 Pylint (static code analysis)
+        entry: poetry run pylint --jobs 0 src/real_estate_scrapers tests
+        pass_filenames: false
+        language: system

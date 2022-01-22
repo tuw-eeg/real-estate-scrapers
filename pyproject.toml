@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "real-estate-scrapers"
+version = "0.1.0"
+description = "Scrapers for real estate websites with an extensible API"
+authors = ["Péter Ferenc Gyarmati <dev.petergy@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+pylint = "^2.12.2"
+black = "^21.12b0"
+mypy = "^0.931"
+isort = "^5.10.1"
+pre-commit = "^2.17.0"
+
+[tool.black]
+line-length = 132
+target-version = ['py39']
+exclude = '''
+/(
+    \.git
+  | __pycache__
+  | .pytest_cache
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 132
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
