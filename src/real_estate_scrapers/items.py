@@ -8,9 +8,27 @@ from web_poet import ItemWebPage, WebPage  # type: ignore
 from real_estate_scrapers.models import ListingType, Location, Price, RealEstate
 
 
-class RealEstateListPage(WebPage):  # type: ignore
+class RealEstateListPage(WebPage, ABC):  # type: ignore
     """Page Object Model for Real Estate List Pages"""
 
+    @staticmethod
+    @abstractmethod
+    def domain() -> str:
+        """
+        Returns: The domain of the website from which the urls are scraped
+        """
+        ...
+
+    @staticmethod
+    @abstractmethod
+    def start_urls() -> List[str]:
+        """
+        Returns: A list of urls to be scraped
+        """
+        ...
+
+    @property
+    @abstractmethod
     def real_estate_urls(self) -> List[str]:
         """
         Returns: A list of urls of the real estate detail items to be scraped
