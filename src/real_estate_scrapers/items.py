@@ -1,123 +1,121 @@
 """Defines the Page Object Model for Real Estates to be scraped"""
 
-from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 
 from web_poet import ItemWebPage, WebPage  # type: ignore
 
-from real_estate_scrapers.models import ListingType, Location, Price, RealEstate
+from real_estate_scrapers.models import (
+    EnergyData,
+    ListingType,
+    Location,
+    Price,
+    RealEstate,
+)
 
 
-class RealEstateListPage(WebPage, ABC):  # type: ignore
+class RealEstateListPage(WebPage):  # type: ignore
     """Page Object Model for Real Estate List Pages"""
 
     @staticmethod
-    @abstractmethod
     def domain() -> str:
         """
-        Returns: The domain of the website from which the urls are scraped
+        Returns: The base domain of the website
+                 from which the scraping should take place
         """
-        ...
+        raise NotImplementedError
 
     @staticmethod
-    @abstractmethod
     def start_urls() -> List[str]:
         """
-        Returns: A list of urls to be scraped
+        Returns: The urls of the website
+        from which ``RealEstatePage``s are scraped
         """
-        ...
+        raise NotImplementedError
 
     @property
-    @abstractmethod
     def real_estate_urls(self) -> List[str]:
         """
-        Returns: A list of urls of the real estate detail items to be scraped
+        Returns: A list of urls to be used
+                 to scrape ``RealEstatePage`` objects
         """
-        ...
+        raise NotImplementedError
 
 
-class RealEstatePage(ItemWebPage, ABC):  # type: ignore
+class RealEstatePage(ItemWebPage):  # type: ignore
     """Defines the Page Object Model for Real Estates to be scraped"""
 
     @property
-    @abstractmethod
-    def url(self) -> str:
-        """
-        Returns: The url of the real estate item
-        """
-        ...
-
-    @property
-    @abstractmethod
     def country(self) -> str:
         """
-        Returns: The country where the real estate item is located
+        Returns: The ISO 3166-1 alpha-3 country code
+                 of the real estate item's location.
         """
-        ...
+        raise NotImplementedError
 
     @property
-    @abstractmethod
     def city(self) -> str:
         """
         Returns: The city where the real estate item is located
         """
-        ...
+        raise NotImplementedError
 
     @property
-    @abstractmethod
     def zip_code(self) -> str:
         """
         Returns: The ZIP code of the real estate item's location
         """
-        ...
+        raise NotImplementedError
 
     @property
-    @abstractmethod
     def listing_type(self) -> ListingType:
         """
         Returns: The ZIP code of the real estate item's location
         """
-        ...
+        raise NotImplementedError
 
     @property
-    @abstractmethod
     def area(self) -> float:
         """
         Returns: The area of the real estate item in square meters
         """
-        ...
+        raise NotImplementedError
 
     @property
-    @abstractmethod
     def price_amount(self) -> float:
         """
         Returns: The price of the real estate item
         """
-        ...
+        raise NotImplementedError
 
     @property
-    @abstractmethod
     def price_currency(self) -> str:
         """
         Returns: The currency in which the real estate item is priced
         """
-        ...
+        raise NotImplementedError
 
     @property
-    @abstractmethod
-    def epc_label(self) -> str:
+    def epc_label(self) -> Optional[str]:
         """
         Returns: The EPC Label (Energy class) of the real estate item
         """
-        ...
+        raise NotImplementedError
 
     @property
-    @abstractmethod
-    def heating_demand(self) -> float:
+    def heating_demand(self) -> Optional[EnergyData]:
         """
-        Returns: The heating demand of the real estate item
+        Returns: The heating demand ``EnergyData``
+                 of the real estate item in kWh/(m²·a)
         """
-        ...
+        raise NotImplementedError
+
+    @property
+    def energy_efficiency(self) -> Optional[EnergyData]:
+        """
+        Returns: The energy efficiency ``EnergyData``
+                 of the real estate item
+        """
+        raise NotImplementedError
 
     def to_item(self) -> RealEstate:
         return RealEstate(
@@ -128,6 +126,6 @@ class RealEstatePage(ItemWebPage, ABC):  # type: ignore
             listing_type=self.listing_type,
             area=self.area,
             price=Price(amount=self.price_amount, currency=self.price_currency),
-            epc_label=self.epc_label,
             heating_demand=self.heating_demand,
+            energy_efficiency=self.energy_efficiency,
         )

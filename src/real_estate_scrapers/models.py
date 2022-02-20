@@ -1,5 +1,5 @@
 """Model classes to represent Real Estate data."""
-from typing import Literal, TypedDict, Union
+from typing import Literal, Optional, TypedDict, Union
 
 ListingType = Union[Literal["sale"], Literal["rent"]]
 
@@ -19,6 +19,13 @@ class Location(TypedDict):
     zip_code: str
 
 
+class EnergyData(TypedDict):
+    """Energy data for a listing."""
+
+    energy_class: str
+    value: float
+
+
 class RealEstate(TypedDict):
     """Real Estate listing information."""
 
@@ -27,5 +34,5 @@ class RealEstate(TypedDict):
     listing_type: ListingType
     area: float
     price: Price
-    epc_label: str
-    heating_demand: float
+    heating_demand: Optional[EnergyData]
+    energy_efficiency: Optional[EnergyData]

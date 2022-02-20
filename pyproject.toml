@@ -31,7 +31,7 @@ exclude = '''
 
 [tool.isort]
 profile = "black"
-line_length = 132
+line_length = 80
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
