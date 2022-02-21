@@ -26,13 +26,20 @@ class EnergyData(TypedDict):
     value: float
 
 
+class ScrapeMetadata(TypedDict):
+    """Metadata for a scrape."""
+
+    url: str
+    timestamp: str
+
+
 class RealEstate(TypedDict):
     """Real Estate listing information."""
 
-    url: str
     location: Location
     listing_type: ListingType
     area: float
     price: Price
     heating_demand: Optional[EnergyData]
     energy_efficiency: Optional[EnergyData]
+    scrape_metadata: ScrapeMetadata

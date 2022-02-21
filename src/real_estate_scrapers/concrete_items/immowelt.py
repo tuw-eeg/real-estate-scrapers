@@ -17,15 +17,43 @@ class ImmoweltRealEstateListPage(RealEstateListPage):
 
     @staticmethod
     def start_urls() -> List[str]:
-        return [
-            "https://www.immowelt.at/liste/bezirk-dornbirn"
-            "/wohnungen/mieten?lat=47.40493333&"
-            "lon=9.69903333&sort=relevanz%20distance"
+        places = [
+            "dornbirn",
+            "graz",
+            "innsbruck",
+            "klagenfurt",
+            "linz",
+            "salzburg",
+            "st-poelten",
+            "steyr",
+            "villach",
+            "wels",
+            "wien",
+            "wiener-neustadt",
         ]
+        objects = ["wohnungen", "haeuser", "wohnen-auf-zeit"]
+        listing_links = [
+            f"https://www.immowelt.at/liste/{place}/{obj}"
+            for place in places
+            for obj in objects
+        ]
+        paginated_links = [
+            f"{link}?cp={page}"
+            for link in listing_links
+            for page in range(2, 3)
+        ]
+        return [*listing_links, *paginated_links]
 
     @property
     def real_estate_urls(self) -> List[str]:
-        return ["https://www.immowelt.at/expose/24xa35g"]
+        listing_ids = [
+            tag.attrib["href"].split("/")[-1]
+            for tag in self.css("#listItemWrapperFixed div a[href^='/expose']")
+        ]
+        return [
+            f"https://www.immowelt.at/expose/{listing_id}"
+            for listing_id in listing_ids
+        ]
 
 
 class ImmoweltRealEstatePage(RealEstatePage):
@@ -40,23 +68,78 @@ class ImmoweltRealEstatePage(RealEstatePage):
 
     @property
     def city(self) -> str:
-        pass
+        # '4400 St. Pölten\xa0'
+        address_text = self.xpath(
+            '//*[@id="aUebersicht"]/app-estate-address/div/sd-cell'
+            "/sd-cell-row/sd-cell-col[2]/span[2]/div[1]/text()"
+        ).get()
+        # '4400 St. Pölten'
+        trimmed_address_text = address_text[:-1]
+        # 'St. Pölten'
+        city: str = " ".join(trimmed_address_text.split()[1:])
+        return city
 
     @property
     def zip_code(self) -> str:
-        pass
+        # '4400 Steyr\xa0'
+        address_text = (
+            self.xpath(
+                '//*[@id="aUebersicht"]/app-estate-address/div/sd-cell'
+                "/sd-cell-row/sd-cell-col[2]/span[2]/div[1]/text()"
+            )
+            .get()
+            .strip()
+        )
+        # '4400 Steyr'
+        trimmed_address_text = address_text[:-1]
+        # '4400'
+        zip_code: str = trimmed_address_text.split()[0]
+        return zip_code
 
     @property
     def listing_type(self) -> ListingType:
-        pass
+        price_caption = (
+            self.xpath(
+                '//*[@id="aUebersicht"]/app-hardfacts'
+                "/div/div/div[1]/div[2]/text()"
+            )
+            .get()
+            .strip()
+        )
+        if price_caption == "Gesamtmiete":
+            return "rent"
+        else:
+            return "sale"
 
     @property
     def area(self) -> float:
-        pass
+        # '1.000,50 m²'
+        area_label = (
+            self.xpath(
+                '//*[@id="aUebersicht"]/app-hardfacts'
+                "/div/div/div[2]/div[1]/span/text()"
+            )
+            .get()
+            .strip()
+        )
+        # 1000.50
+        num_str = area_label.split()[0].replace(".", "").replace(",", ".")
+        return 0 if num_str.isalpha() else float(num_str)
 
     @property
     def price_amount(self) -> float:
-        pass
+        # '€\xa07.117,12'
+        price_label = (
+            self.xpath(
+                '//*[@id="aUebersicht"]/app-hardfacts'
+                "/div/div/div[1]/div[1]/strong/text()"
+            )
+            .get()
+            .strip()
+        )
+        # 7117.12
+        num_str = price_label[2:].replace(".", "").replace(",", ".")
+        return 0 if num_str.isalpha() else float(num_str)
 
     @property
     def price_currency(self) -> str:
@@ -64,12 +147,12 @@ class ImmoweltRealEstatePage(RealEstatePage):
 
     @property
     def epc_label(self) -> Optional[str]:
-        pass
+        return None
 
     @property
     def heating_demand(self) -> Optional[EnergyData]:
-        pass
+        return None
 
     @property
     def energy_efficiency(self) -> Optional[EnergyData]:
-        pass
+        return None

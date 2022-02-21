@@ -1,5 +1,5 @@
 """Defines the Page Object Model for Real Estates to be scraped"""
-
+from datetime import datetime
 from typing import List, Optional
 
 from web_poet import ItemWebPage, WebPage  # type: ignore
@@ -10,6 +10,7 @@ from real_estate_scrapers.models import (
     Location,
     Price,
     RealEstate,
+    ScrapeMetadata,
 )
 
 
@@ -119,7 +120,6 @@ class RealEstatePage(ItemWebPage):  # type: ignore
 
     def to_item(self) -> RealEstate:
         return RealEstate(
-            url=self.url,
             location=Location(
                 country=self.country, city=self.city, zip_code=self.zip_code
             ),
@@ -128,4 +128,7 @@ class RealEstatePage(ItemWebPage):  # type: ignore
             price=Price(amount=self.price_amount, currency=self.price_currency),
             heating_demand=self.heating_demand,
             energy_efficiency=self.energy_efficiency,
+            scrape_metadata=ScrapeMetadata(
+                url=self.url, timestamp=str(datetime.now().timestamp())
+            ),
         )
