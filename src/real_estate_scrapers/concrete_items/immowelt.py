@@ -33,7 +33,7 @@ class ImmoweltRealEstateListPage(RealEstateListPage):
         ]
         objects = ["wohnungen", "haeuser", "wohnen-auf-zeit"]
         listing_links = [f"https://www.immowelt.at/liste/{place}/{obj}" for place in places for obj in objects]
-        paginated_links = [f"{link}?cp={page}" for link in listing_links for page in range(2, 3)]
+        paginated_links = [f"{link}?cp={page}" for link in listing_links for page in range(2, 10)]
         return [*listing_links, *paginated_links]
 
     @property
@@ -87,20 +87,20 @@ class ImmoweltRealEstatePage(RealEstatePage):
             return "sale"
 
     @property
-    def area(self) -> float:
+    def area(self) -> Optional[float]:
         # '1.000,50 m²'
         area_label = self.xpath('//*[@id="aUebersicht"]/app-hardfacts' "/div/div/div[2]/div[1]/span/text()").get().strip()
         # 1000.50
         num_str = area_label.split()[0].replace(".", "").replace(",", ".")
-        return 0 if num_str.isalpha() else float(num_str)
+        return float(num_str) if self.fmtckr.is_numeric(num_str) else None
 
     @property
-    def price_amount(self) -> float:
+    def price_amount(self) -> Optional[float]:
         # '€\xa07.117,12'
         price_label = self.xpath('//*[@id="aUebersicht"]/app-hardfacts' "/div/div/div[1]/div[1]/strong/text()").get().strip()
         # 7117.12
         num_str = price_label[2:].replace(".", "").replace(",", ".")
-        return 0 if num_str.isalpha() else float(num_str)
+        return float(num_str) if self.fmtckr.is_numeric(num_str) else None
 
     @property
     def price_currency(self) -> str:

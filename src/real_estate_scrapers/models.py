@@ -38,8 +38,8 @@ class RealEstate(TypedDict):
 
     location: Location
     listing_type: ListingType
-    area: float
-    price: Price
+    area: Optional[float]
+    price: Optional[Price]
     heating_demand: Optional[EnergyData]
     energy_efficiency: Optional[EnergyData]
     scrape_metadata: ScrapeMetadata

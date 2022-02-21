@@ -4,6 +4,7 @@ from typing import List, Optional
 
 from web_poet import ItemWebPage, WebPage  # type: ignore
 
+from real_estate_scrapers.format_checker import FormatChecker
 from real_estate_scrapers.models import EnergyData, ListingType, Location, Price, RealEstate, ScrapeMetadata
 
 
@@ -39,6 +40,10 @@ class RealEstatePage(ItemWebPage):  # type: ignore
     """Defines the Page Object Model for Real Estates to be scraped"""
 
     @property
+    def fmtckr(self) -> FormatChecker:
+        return FormatChecker()
+
+    @property
     def country(self) -> str:
         """
         Returns: The ISO 3166-1 alpha-3 country code
@@ -68,14 +73,14 @@ class RealEstatePage(ItemWebPage):  # type: ignore
         raise NotImplementedError
 
     @property
-    def area(self) -> float:
+    def area(self) -> Optional[float]:
         """
         Returns: The area of the real estate item in square meters
         """
         raise NotImplementedError
 
     @property
-    def price_amount(self) -> float:
+    def price_amount(self) -> Optional[float]:
         """
         Returns: The price of the real estate item
         """
@@ -116,7 +121,7 @@ class RealEstatePage(ItemWebPage):  # type: ignore
             location=Location(country=self.country, city=self.city, zip_code=self.zip_code),
             listing_type=self.listing_type,
             area=self.area,
-            price=Price(amount=self.price_amount, currency=self.price_currency),
+            price=self.price_amount and Price(amount=self.price_amount, currency=self.price_currency) or None,
             heating_demand=self.heating_demand,
             energy_efficiency=self.energy_efficiency,
             scrape_metadata=ScrapeMetadata(url=self.url, timestamp=str(datetime.now().timestamp())),
