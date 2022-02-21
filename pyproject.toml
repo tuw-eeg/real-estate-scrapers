@@ -19,7 +19,7 @@ isort = "^5.10.1"
 pre-commit = "^2.17.0"
 
 [tool.black]
-line-length = 80
+line-length = 132
 target-version = ['py39']
 exclude = '''
 /(
@@ -31,7 +31,7 @@ exclude = '''
 
 [tool.isort]
 profile = "black"
-line_length = 80
+line_length = 132
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

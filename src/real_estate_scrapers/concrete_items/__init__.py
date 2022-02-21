@@ -25,20 +25,14 @@ for module_info in pkgutil.iter_modules([str(_dirpath)]):
     # for ``RealEstateListPage`` and ``RealEstatePage``
     full_module_name = f"{__package__}.{module_info.name}"
     full_module_path = _dirpath / f"{module_info.name}.py"
-    spec = importlib.util.spec_from_file_location(
-        full_module_name, str(full_module_path)
-    )
+    spec = importlib.util.spec_from_file_location(full_module_name, str(full_module_path))
     module = importlib.util.module_from_spec(spec)  # type: ignore
     spec.loader.exec_module(module)  # type: ignore
     # Extract classes
     classes = inspect.getmembers(module, inspect.isclass)
     # Filter for the needed subclasses
-    list_page_class = [
-        cls for _, cls in classes if issubclass(cls, RealEstateListPage)
-    ][0]
-    page_class = [cls for _, cls in classes if issubclass(cls, RealEstatePage)][
-        0
-    ]
+    list_page_class = [cls for _, cls in classes if issubclass(cls, RealEstateListPage)][0]
+    page_class = [cls for _, cls in classes if issubclass(cls, RealEstatePage)][0]
     _scrapy_poet_overrides[list_page_class.domain()] = {
         RealEstateListPage: list_page_class,
         RealEstatePage: page_class,
@@ -46,9 +40,7 @@ for module_info in pkgutil.iter_modules([str(_dirpath)]):
     _start_urls = _start_urls + list_page_class.start_urls()
 
 
-def get_scrapy_poet_overrides() -> Dict[
-    str, Dict[Type[WebPage], Type[WebPage]]
-]:
+def get_scrapy_poet_overrides() -> Dict[str, Dict[Type[WebPage], Type[WebPage]]]:
     """
     Returns: Configuration to override the exact ``RealEstateListPage``
              and ``RealEstatePage`` implementation dynamically
