@@ -8,3 +8,6 @@ analyze:
 
 test:
 	export PYTHONPATH=src && poetry run pytest
+
+run:
+	cd src && poetry run scrapy crawl real_estate_spider
