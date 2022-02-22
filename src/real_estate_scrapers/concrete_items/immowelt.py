@@ -38,7 +38,9 @@ class ImmoweltRealEstateListPage(RealEstateListPage):
 
     @property
     def real_estate_urls(self) -> List[str]:
-        listing_ids = [tag.attrib["href"].split("/")[-1] for tag in self.css("#listItemWrapperFixed div a[href^='/expose']")]
+        listing_ids = [
+            tag.attrib["href"].split("/")[-1] for tag in self.css("#listItemWrapperFixed div a[href^='/expose']")
+        ]
         return [f"https://www.immowelt.at/expose/{listing_id}" for listing_id in listing_ids]
 
 
@@ -55,9 +57,13 @@ class ImmoweltRealEstatePage(RealEstatePage):
     @property
     def city(self) -> str:
         # '4400 St. Pölten\xa0'
-        address_text = self.xpath(
-            '//*[@id="aUebersicht"]/app-estate-address/div/sd-cell' "/sd-cell-row/sd-cell-col[2]/span[2]/div[1]/text()"
-        ).get()
+        address_text = (
+            self.xpath(
+                '//*[@id="aUebersicht"]/app-estate-address/div/sd-cell/sd-cell-row/sd-cell-col[2]/span[2]/div[1]/text()'
+            )
+            .get()
+            .strip()
+        )
         # '4400 St. Pölten'
         trimmed_address_text = address_text[:-1]
         # 'St. Pölten'
@@ -68,7 +74,9 @@ class ImmoweltRealEstatePage(RealEstatePage):
     def zip_code(self) -> str:
         # '4400 Steyr\xa0'
         address_text = (
-            self.xpath('//*[@id="aUebersicht"]/app-estate-address/div/sd-cell' "/sd-cell-row/sd-cell-col[2]/span[2]/div[1]/text()")
+            self.xpath(
+                '//*[@id="aUebersicht"]/app-estate-address/div/sd-cell/sd-cell-row/sd-cell-col[2]/span[2]/div[1]/text()'
+            )
             .get()
             .strip()
         )
@@ -89,7 +97,9 @@ class ImmoweltRealEstatePage(RealEstatePage):
     @property
     def area(self) -> Optional[float]:
         # '1.000,50 m²'
-        area_label = self.xpath('//*[@id="aUebersicht"]/app-hardfacts' "/div/div/div[2]/div[1]/span/text()").get().strip()
+        area_label = (
+            self.xpath('//*[@id="aUebersicht"]/app-hardfacts' "/div/div/div[2]/div[1]/span/text()").get().strip()
+        )
         # 1000.50
         num_str = area_label.split()[0].replace(".", "").replace(",", ".")
         return float(num_str) if self.fmtckr.is_numeric(num_str) else None
@@ -97,7 +107,9 @@ class ImmoweltRealEstatePage(RealEstatePage):
     @property
     def price_amount(self) -> Optional[float]:
         # '€\xa07.117,12'
-        price_label = self.xpath('//*[@id="aUebersicht"]/app-hardfacts' "/div/div/div[1]/div[1]/strong/text()").get().strip()
+        price_label = (
+            self.xpath('//*[@id="aUebersicht"]/app-hardfacts' "/div/div/div[1]/div[1]/strong/text()").get().strip()
+        )
         # 7117.12
         num_str = price_label[2:].replace(".", "").replace(",", ".")
         return float(num_str) if self.fmtckr.is_numeric(num_str) else None
