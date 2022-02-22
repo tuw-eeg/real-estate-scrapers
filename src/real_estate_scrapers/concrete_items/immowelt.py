@@ -33,7 +33,7 @@ class ImmoweltRealEstateListPage(RealEstateListPage):
         ]
         objects = ["wohnungen", "haeuser", "wohnen-auf-zeit"]
         listing_links = [f"https://www.immowelt.at/liste/{place}/{obj}" for place in places for obj in objects]
-        paginated_links = [f"{link}?cp={page}" for link in listing_links for page in range(2, 10)]
+        paginated_links = [f"{link}?cp={page}" for link in listing_links for page in range(2, 201)]
         return [*listing_links, *paginated_links]
 
     @property
@@ -56,7 +56,7 @@ class ImmoweltRealEstatePage(RealEstatePage):
 
     @property
     def city(self) -> str:
-        # '4400 St. Pölten\xa0'
+        # '4400 St. Pölten'
         address_text = (
             self.xpath(
                 '//*[@id="aUebersicht"]/app-estate-address/div/sd-cell/sd-cell-row/sd-cell-col[2]/span[2]/div[1]/text()'
@@ -64,15 +64,13 @@ class ImmoweltRealEstatePage(RealEstatePage):
             .get()
             .strip()
         )
-        # '4400 St. Pölten'
-        trimmed_address_text = address_text[:-1]
         # 'St. Pölten'
-        city: str = " ".join(trimmed_address_text.split()[1:])
+        city: str = " ".join(address_text.split()[1:])
         return city
 
     @property
     def zip_code(self) -> str:
-        # '4400 Steyr\xa0'
+        # '4400 Steyr'
         address_text = (
             self.xpath(
                 '//*[@id="aUebersicht"]/app-estate-address/div/sd-cell/sd-cell-row/sd-cell-col[2]/span[2]/div[1]/text()'
@@ -80,10 +78,8 @@ class ImmoweltRealEstatePage(RealEstatePage):
             .get()
             .strip()
         )
-        # '4400 Steyr'
-        trimmed_address_text = address_text[:-1]
         # '4400'
-        zip_code: str = trimmed_address_text.split()[0]
+        zip_code: str = address_text.split()[0]
         return zip_code
 
     @property
@@ -118,14 +114,20 @@ class ImmoweltRealEstatePage(RealEstatePage):
     def price_currency(self) -> str:
         return "EUR"
 
-    @property
-    def epc_label(self) -> Optional[str]:
-        return None
+    def __extract_energy_data(self, base_selector_query: str) -> Optional[EnergyData]:
+        base_selector = self.xpath(base_selector_query)
+        if len(base_selector) == 0:
+            return None
+        heating_demand_h4_selector = base_selector[0]
+        energy_class = heating_demand_h4_selector.xpath("following-sibling::div[1]/span/text()").get()
+        value_str = heating_demand_h4_selector.xpath("following-sibling::p[1]/text()").get()
+        num_str = value_str.split()[0].replace(".", "").replace(",", ".")
+        return EnergyData(energy_class=energy_class, value=float(num_str) if self.fmtckr.is_numeric(num_str) else None)
 
     @property
     def heating_demand(self) -> Optional[EnergyData]:
-        return None
+        return self.__extract_energy_data("//app-energy-certificate-at/h4[text()[contains(.,'(HWB)')]]")
 
     @property
     def energy_efficiency(self) -> Optional[EnergyData]:
-        return None
+        return self.__extract_energy_data("//app-energy-certificate-at/h4[text()[contains(.,'(fGEE)')]]")

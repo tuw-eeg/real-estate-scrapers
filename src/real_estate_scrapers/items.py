@@ -94,13 +94,6 @@ class RealEstatePage(ItemWebPage):  # type: ignore
         raise NotImplementedError
 
     @property
-    def epc_label(self) -> Optional[str]:
-        """
-        Returns: The EPC Label (Energy class) of the real estate item
-        """
-        raise NotImplementedError
-
-    @property
     def heating_demand(self) -> Optional[EnergyData]:
         """
         Returns: The heating demand ``EnergyData``

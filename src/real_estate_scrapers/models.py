@@ -22,8 +22,8 @@ class Location(TypedDict):
 class EnergyData(TypedDict):
     """Energy data for a listing."""
 
-    energy_class: str
-    value: float
+    energy_class: Optional[str]
+    value: Optional[float]
 
 
 class ScrapeMetadata(TypedDict):
