@@ -9,6 +9,8 @@ python = "^3.9"
 Scrapy = "^2.5.1"
 web-poet = "^0.1.1"
 scrapy-poet = "^0.3.0"
+psycopg2 = "^2.9.3"
+SQLAlchemy = "^1.4.31"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
