@@ -27,6 +27,11 @@ DOWNLOADER_MIDDLEWARES = {
     "scrapy_poet.InjectionMiddleware": 543,
 }
 
+# Persist scraped items in the database
+ITEM_PIPELINES = {
+    "real_estate_scrapers.pipelines.PostgresPipeline": 300,
+}
+
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 # CONCURRENT_REQUESTS = 32
 
@@ -60,12 +65,6 @@ DOWNLOADER_MIDDLEWARES = {
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
 # EXTENSIONS = {
 #    'scrapy.extensions.telnet.TelnetConsole': None,
-# }
-
-# Configure item pipelines
-# See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-# ITEM_PIPELINES = {
-#    'real_estate_scrapers.pipelines.RealEstateScrapersPipeline': 300,
 # }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

@@ -30,7 +30,7 @@ class ScrapeMetadata(TypedDict):
     """Metadata for a scrape."""
 
     url: str
-    timestamp: str
+    timestamp: float
 
 
 class RealEstate(TypedDict):

@@ -117,5 +117,5 @@ class RealEstatePage(ItemWebPage):  # type: ignore
             price=self.price_amount and Price(amount=self.price_amount, currency=self.price_currency) or None,
             heating_demand=self.heating_demand,
             energy_efficiency=self.energy_efficiency,
-            scrape_metadata=ScrapeMetadata(url=self.url, timestamp=str(datetime.now().timestamp())),
+            scrape_metadata=ScrapeMetadata(url=self.url, timestamp=datetime.now().timestamp()),
         )
