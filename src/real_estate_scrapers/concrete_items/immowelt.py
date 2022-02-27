@@ -111,7 +111,7 @@ class ImmoweltRealEstatePage(RealEstatePage):
         return float(num_str) if self.fmtckr.is_numeric(num_str) else None
 
     @property
-    def price_currency(self) -> str:
+    def price_unit(self) -> str:
         return "EUR"
 
     def __extract_energy_data(self, base_selector_query: str) -> Optional[EnergyData]:

@@ -87,7 +87,7 @@ class RealEstatePage(ItemWebPage):  # type: ignore
         raise NotImplementedError
 
     @property
-    def price_currency(self) -> str:
+    def price_unit(self) -> str:
         """
         Returns: The currency in which the real estate item is priced
         """
@@ -114,7 +114,7 @@ class RealEstatePage(ItemWebPage):  # type: ignore
             location=Location(country=self.country, city=self.city, zip_code=self.zip_code),
             listing_type=self.listing_type,
             area=self.area,
-            price=self.price_amount and Price(amount=self.price_amount, currency=self.price_currency) or None,
+            price=self.price_amount and Price(amount=self.price_amount, unit=self.price_unit) or None,
             heating_demand=self.heating_demand,
             energy_efficiency=self.energy_efficiency,
             scrape_metadata=ScrapeMetadata(url=self.url, timestamp=datetime.now().timestamp()),

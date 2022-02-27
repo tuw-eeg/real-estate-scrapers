@@ -22,7 +22,7 @@ class RealEstateDBItem(SQLBaseModel):  # type: ignore
     listing_type = Column(String)
     area = Column(Float, nullable=True)
     price_amount = Column(Float, nullable=True)
-    price_currency = Column(String, nullable=True)
+    price_unit = Column(String, nullable=True)
     heating_demand_energy_class = Column(String, nullable=True)
     heating_demand_value = Column(Float, nullable=True)
     energy_efficiency_energy_class = Column(String, nullable=True)
@@ -47,7 +47,7 @@ class RealEstateDBItem(SQLBaseModel):  # type: ignore
             listing_type=dct["listing_type"],
             area=dct["area"],
             price_amount=dct["price"] and dct["price"]["amount"] or None,
-            price_currency=dct["price"] and dct["price"]["currency"] or None,
+            price_unit=dct["price"] and dct["price"]["unit"] or None,
             heating_demand_energy_class=dct["heating_demand"] and dct["heating_demand"]["energy_class"] or None,
             heating_demand_value=dct["heating_demand"] and dct["heating_demand"]["value"] or None,
             energy_efficiency_energy_class=dct["energy_efficiency"]
@@ -68,7 +68,7 @@ class RealEstateDBItem(SQLBaseModel):  # type: ignore
             f"listing_type={self.listing_type}, "
             f"area={self.area}, "
             f"price_amount={self.price_amount}, "
-            f"price_currency={self.price_currency}, "
+            f"price_unit={self.price_unit}, "
             f"heating_demand_energy_class={self.heating_demand_energy_class}, "
             f"heating_demand_value={self.heating_demand_value}, "
             f"energy_efficiency_energy_class={self.energy_efficiency_energy_class}, "

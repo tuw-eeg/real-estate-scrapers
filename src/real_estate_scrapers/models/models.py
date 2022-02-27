@@ -8,7 +8,7 @@ class Price(TypedDict):
     """Price information for a listing."""
 
     amount: float
-    currency: str
+    unit: str
 
 
 class Location(TypedDict):
