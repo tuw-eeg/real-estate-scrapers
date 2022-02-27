@@ -166,10 +166,10 @@ class ImmoweltRealEstatePage(RealEstatePage):
 
     @property
     def object_type(self) -> str:
-        # 'https://www.immowelt.at/liste/wien-18-waehring/haeuser/mieten?sort=relevanz#235vg5p'
-        back_href = self.xpath("//a[@title='Zurück']/@href").get()
+        # 'https://www.immowelt.at/suche/haeuser'
+        back_href = self.xpath("//app-breadcrumb/descendant-or-self::nav/ol/li[2]/a/@href").get()
         if back_href is None:
             raise ValueError("No back href found for object type")
         # 'haeuser'
-        object_type_slug = back_href.split("/")[-2]
+        object_type_slug = back_href.split("/")[-1]
         return real_estate_type_map.get(object_type_slug, "unknown")
