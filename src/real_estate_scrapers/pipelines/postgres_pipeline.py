@@ -13,16 +13,16 @@ class PostgresPipeline:
     # Batches of items to persist to the database
     batch_size = 100
 
-    def __init__(self, handler: DatabaseHandler):
-        self.num_items = 0
-        self.handler = handler
-        self.session = self.handler.create_session()
-
     @classmethod
     def from_crawler(cls, _: scrapy.crawler.Crawler) -> "PostgresPipeline":
         """Create an instance of the pipeline from a crawler."""
         logger.debug("Creating PostgresPipeline...")
         return cls(handler=db_handler)
+
+    def __init__(self, handler: DatabaseHandler):
+        self.num_items = 0
+        self.handler = handler
+        self.session = self.handler.create_session()
 
     def open_spider(self, _: scrapy.Spider) -> None:
         """
@@ -31,7 +31,7 @@ class PostgresPipeline:
         Args:
             _: The spider that is being opened.
         """
-        logger.debug("Opening spider...")
+        logger.debug("PostgresPipeline open_spider hook...")
 
     def close_spider(self, _: scrapy.Spider) -> None:
         """
@@ -40,7 +40,7 @@ class PostgresPipeline:
         Args:
             _: The spider that is being closed.
         """
-        logger.debug("Closing spider...")
+        logger.debug("PostgresPipeline close_spider hook...")
         # Commit the remaining items
         self.session.commit()
         self.session.close_all()

@@ -29,7 +29,8 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Persist scraped items in the database
 ITEM_PIPELINES = {
-    "real_estate_scrapers.pipelines.PostgresPipeline": 300,
+    "real_estate_scrapers.pipelines.DuplicatesPipeline": 300,
+    "real_estate_scrapers.pipelines.PostgresPipeline": 400,
 }
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
