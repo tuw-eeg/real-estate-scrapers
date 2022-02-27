@@ -1,40 +1,29 @@
 # pylint: disable-all
 # type: ignore
 
-# Scrapy settings for real_estate_scrapers project
-#
-# For simplicity, this file contains only settings considered important or
-# commonly used. You can find more settings consulting the documentation:
-#
-#     https://docs.scrapy.org/en/latest/topics/settings.html
-#     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
-#     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-
 BOT_NAME = "real_estate_scrapers"
 
 SPIDER_MODULES = ["real_estate_scrapers.spiders"]
 NEWSPIDER_MODULE = "real_estate_scrapers.spiders"
 
-# Crawl responsibly by identifying yourself (and your website) on the user-agent
-# USER_AGENT = 'real_estate_scrapers (+http://www.yourdomain.com)'
-
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
-# Enabling scrapy_poet downloader middleware so that
-# the ``page`` kwargs get injected into the ``parse`` method automatically
 DOWNLOADER_MIDDLEWARES = {
+    # Enabling scrapy_poet downloader middleware so that
+    # the ``page`` kwargs get injected into the ``parse`` method automatically
     "scrapy_poet.InjectionMiddleware": 543,
 }
 
-# Persist scraped items in the database
 ITEM_PIPELINES = {
+    # Skip duplicate items
     "real_estate_scrapers.pipelines.DuplicatesPipeline": 300,
+    # Persist scraped items to the database
     "real_estate_scrapers.pipelines.PostgresPipeline": 400,
 }
 
-# Configure maximum concurrent requests performed by Scrapy (default: 16)
-# CONCURRENT_REQUESTS = 32
+# Maximum concurrent requests performed by Scrapy
+CONCURRENT_REQUESTS = 64
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -54,12 +43,6 @@ ITEM_PIPELINES = {
 # DEFAULT_REQUEST_HEADERS = {
 #   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 #   'Accept-Language': 'en',
-# }
-
-# Enable or disable spider middlewares
-# See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-# SPIDER_MIDDLEWARES = {
-#    'real_estate_scrapers.middlewares.RealEstateScrapersSpiderMiddleware': 543,
 # }
 
 # Enable or disable extensions

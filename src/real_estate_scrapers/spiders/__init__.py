@@ -1,4 +1,4 @@
-# This package will contain the spiders of your Scrapy project
-#
-# Please refer to the documentation for information on how to create and manage
-# your spiders.
+"""Real Estate Spiders"""
+from real_estate_scrapers.spiders.real_estate_spider import RealEstateSpider
+
+__all__ = ["RealEstateSpider"]

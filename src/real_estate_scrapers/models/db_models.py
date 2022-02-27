@@ -23,10 +23,14 @@ class RealEstateDBItem(SQLBaseModel):  # type: ignore
     area = Column(Float, nullable=True)
     price_amount = Column(Float, nullable=True)
     price_unit = Column(String, nullable=True)
-    heating_demand_energy_class = Column(String, nullable=True)
-    heating_demand_value = Column(Float, nullable=True)
-    energy_efficiency_energy_class = Column(String, nullable=True)
-    energy_efficiency_value = Column(Float, nullable=True)
+    epc_data_heating_demand_energy_class = Column(String, nullable=True)
+    epc_data_heating_demand_value = Column(Float, nullable=True)
+    epc_data_energy_efficiency_energy_class = Column(String, nullable=True)
+    epc_data_energy_efficiency_value = Column(Float, nullable=True)
+    epc_data_epc_pdf_url = Column(String, nullable=True)
+    epc_data_epc_issued_date = Column(DateTime, nullable=True)
+    item_metadata_date_built = Column(DateTime, nullable=True)
+    item_metadata_type = Column(String)
     scrape_metadata_url = Column(String)
     scrape_metadata_timestamp = Column(DateTime)
 
@@ -48,31 +52,22 @@ class RealEstateDBItem(SQLBaseModel):  # type: ignore
             area=dct["area"],
             price_amount=dct["price"] and dct["price"]["amount"] or None,
             price_unit=dct["price"] and dct["price"]["unit"] or None,
-            heating_demand_energy_class=dct["heating_demand"] and dct["heating_demand"]["energy_class"] or None,
-            heating_demand_value=dct["heating_demand"] and dct["heating_demand"]["value"] or None,
-            energy_efficiency_energy_class=dct["energy_efficiency"]
-            and dct["energy_efficiency"]["energy_class"]
+            epc_data_heating_demand_energy_class=dct["epc_data"]["heating_demand"]
+            and dct["epc_data"]["heating_demand"]["energy_class"]
             or None,
-            energy_efficiency_value=dct["energy_efficiency"] and dct["energy_efficiency"]["value"] or None,
+            epc_data_heating_demand_value=dct["epc_data"]["heating_demand"]
+            and dct["epc_data"]["heating_demand"]["value"]
+            or None,
+            epc_data_energy_efficiency_energy_class=dct["epc_data"]["energy_efficiency"]
+            and dct["epc_data"]["energy_efficiency"]["energy_class"]
+            or None,
+            epc_data_energy_efficiency_value=dct["epc_data"]["energy_efficiency"]
+            and dct["epc_data"]["energy_efficiency"]["value"]
+            or None,
+            epc_data_epc_pdf_url=dct["epc_data"]["epc_pdf_url"],
+            epc_data_epc_issued_date=dct["epc_data"]["epc_issued_date"],
+            item_metadata_date_built=dct["item_metadata"]["date_built"],
+            item_metadata_type=dct["item_metadata"]["type"],
             scrape_metadata_url=dct["scrape_metadata"]["url"],
             scrape_metadata_timestamp=datetime.fromtimestamp(dct["scrape_metadata"]["timestamp"]),
-        )
-
-    def __repr__(self) -> str:
-        """Object representation."""
-        return (
-            f"<RealEstateDBItem(id={self.id}, "
-            f"location_country={self.location_country}, "
-            f"location_city={self.location_city}, "
-            f"location_zip_code={self.location_zip_code}, "
-            f"listing_type={self.listing_type}, "
-            f"area={self.area}, "
-            f"price_amount={self.price_amount}, "
-            f"price_unit={self.price_unit}, "
-            f"heating_demand_energy_class={self.heating_demand_energy_class}, "
-            f"heating_demand_value={self.heating_demand_value}, "
-            f"energy_efficiency_energy_class={self.energy_efficiency_energy_class}, "
-            f"energy_efficiency_value={self.energy_efficiency_value}, "
-            f"scrape_metadata_url={self.scrape_metadata_url}, "
-            f"scrape_metadata_timestamp={self.scrape_metadata_timestamp})>"
         )

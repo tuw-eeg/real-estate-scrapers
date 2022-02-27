@@ -1,8 +1,15 @@
 """Scraper specification for https://www.immowelt.at/"""
+from datetime import datetime
 from typing import List, Optional
 
 from real_estate_scrapers.items import RealEstateListPage, RealEstatePage
 from real_estate_scrapers.models import EnergyData, ListingType
+
+real_estate_type_map = {
+    "haeuser": "Haus",
+    "wohnungen": "Wohnung",
+    "wohnen-auf-zeit": "Wohnung",
+}
 
 
 class ImmoweltRealEstateListPage(RealEstateListPage):
@@ -31,7 +38,7 @@ class ImmoweltRealEstateListPage(RealEstateListPage):
             "wien",
             "wiener-neustadt",
         ]
-        objects = ["wohnungen", "haeuser", "wohnen-auf-zeit"]
+        objects = real_estate_type_map.keys()
         listing_links = [f"https://www.immowelt.at/liste/{place}/{obj}" for place in places for obj in objects]
         paginated_links = [f"{link}?cp={page}" for link in listing_links for page in range(2, 201)]
         return [*listing_links, *paginated_links]
@@ -137,3 +144,32 @@ class ImmoweltRealEstatePage(RealEstatePage):
     @property
     def energy_efficiency(self) -> Optional[EnergyData]:
         return self.__extract_energy_data("//app-energy-certificate-at/h4[text()[contains(.,'(fGEE)')]]")
+
+    @property
+    def epc_pdf_url(self) -> Optional[str]:
+        # No EPC data available on Immowelt
+        return None
+
+    @property
+    def epc_issued_date(self) -> Optional[datetime]:
+        # No EPC data available on Immowelt
+        return None
+
+    @property
+    def date_of_building(self) -> Optional[datetime]:
+        # (Ca.)? 1900
+        year_str_raw = self.xpath('//sd-cell-col/p[text()="Baujahr"]/following-sibling::p/text()').get()
+        if year_str_raw is not None and self.fmtckr.contains_number(year_str_raw):
+            year_str = self.fmtckr.extract_year(year_str_raw)
+            return datetime(int(year_str), 1, 1)
+        return None
+
+    @property
+    def object_type(self) -> str:
+        # 'https://www.immowelt.at/liste/wien-18-waehring/haeuser/mieten?sort=relevanz#235vg5p'
+        back_href = self.xpath("//a[@title='Zurück']/@href").get()
+        if back_href is None:
+            raise ValueError("No back href found for object type")
+        # 'haeuser'
+        object_type_slug = back_href.split("/")[-2]
+        return real_estate_type_map.get(object_type_slug, "unknown")
