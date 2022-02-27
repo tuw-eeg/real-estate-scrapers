@@ -85,7 +85,7 @@ class ImmoweltRealEstatePage(RealEstatePage):
     @property
     def listing_type(self) -> ListingType:
         price_caption = self.xpath('//*[@id="aUebersicht"]/app-hardfacts' "/div/div/div[1]/div[2]/text()").get().strip()
-        if price_caption == "Gesamtmiete":
+        if "miet" in price_caption.lower():
             return "rent"
         else:
             return "sale"
@@ -112,7 +112,13 @@ class ImmoweltRealEstatePage(RealEstatePage):
 
     @property
     def price_unit(self) -> str:
-        return "EUR"
+        price_caption = self.xpath('//*[@id="aUebersicht"]/app-hardfacts' "/div/div/div[1]/div[2]/text()").get().strip()
+        if price_caption == "Kaufpreis":
+            return "EUR"
+        elif "miet" in price_caption.lower():
+            return "EUR/MONTH"
+        else:
+            raise NotImplementedError(f"No price unit mapping for: '{price_caption}'")
 
     def __extract_energy_data(self, base_selector_query: str) -> Optional[EnergyData]:
         base_selector = self.xpath(base_selector_query)
