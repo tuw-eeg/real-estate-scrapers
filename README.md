@@ -8,7 +8,7 @@ different real estate websites) abd the spider logic (the logic to collect the d
 ## Installation
 
 This project uses [Poetry](https://python-poetry.org/) to manage Python packaging and dependencies. To install `poetry`
-itself, please refer to the [official docs]=(https://python-poetry.org/docs/#installation).
+itself, please refer to the [official docs](https://python-poetry.org/docs/#installation).
 
 Kindly install the dependencies using the following command:
 
