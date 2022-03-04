@@ -65,3 +65,13 @@ Thanks to `web-poet` and `scrapy-poet`, it is possible to add support for a new 
 to create a new `.py` file in the `src/real_estate_scrapers/concrete_items` directory, and implement
 the `RealEstateListPage` and `RealEstatePage` classes. That's it! The registration of the implementation to the spider
 is done auto-magically.
+
+### Crawling items only from a specific website
+
+In order to avoid re-running the crawling for every single supported website, one can pass the `-a only_domain=<domain>`
+argument to the spider. For example, if one wants to crawl items only from the `immowelt.at` website, then the command
+to be executed from the `src` directory is:
+
+```shell
+scrapy crawl real_estate_spider -a only_domain=immowelt.at
+```
