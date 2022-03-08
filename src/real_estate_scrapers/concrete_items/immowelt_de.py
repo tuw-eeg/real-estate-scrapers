@@ -138,7 +138,7 @@ class ImmoweltDeRealEstateListPage(RealEstateListPage):
         ]
         objects = real_estate_type_map.keys()
         listing_links = [f"https://www.immowelt.de/liste/{place}/{obj}" for place in places for obj in objects]
-        paginated_links = [f"{link}?cp={page}" for link in listing_links for page in range(2, 201)]
+        paginated_links = [f"{link}?sp={page}" for link in listing_links for page in range(2, 201)]
         return [*listing_links, *paginated_links]
 
     @property
