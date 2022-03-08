@@ -192,20 +192,20 @@ class ImmoweltDeRealEstatePage(RealEstatePage):
 
     @property
     def price_amount(self) -> Optional[float]:
-        # '€\xa07.117,12'
+        # '548.000\xa0€'
         price_label = (
-            self.xpath('//*[@id="aUebersicht"]/app-hardfacts' "/div/div/div[1]/div[1]/strong/text()").get().strip()
+            self.xpath('//*[@id="aUebersicht"]/app-hardfacts/div/div/div[1]/div[1]/strong/text()').get().strip()
         )
-        # 7117.12
-        num_str = price_label[2:].replace(".", "").replace(",", ".")
+        # 548000
+        num_str = price_label[:-2].replace(".", "").replace(",", ".")
         return float(num_str) if self.fmtckr.is_numeric(num_str) else None
 
     @property
     def price_unit(self) -> str:
-        price_caption = self.xpath('//*[@id="aUebersicht"]/app-hardfacts' "/div/div/div[1]/div[2]/text()").get().strip()
-        if price_caption == "Kaufpreis":
+        price_caption = self.xpath('//*[@id="aUebersicht"]/app-hardfacts/div/div/div[1]/div[2]/text()').get().strip()
+        if any(kw in price_caption.lower() for kw in ["kauf", "mindest"]):
             return "EUR"
-        elif "miet" in price_caption.lower():
+        elif any(kw in price_caption.lower() for kw in ["miet"]):
             return "EUR/MONTH"
         else:
             raise NotImplementedError(f"No price unit mapping for: '{price_caption}'")
@@ -217,12 +217,14 @@ class ImmoweltDeRealEstatePage(RealEstatePage):
             return None
         energy_info_tag = energy_info_selection[0]
         # '71,30 kWh/(m²·a)  - Warmwasser enthalten'
-        heating_demand_text = energy_info_tag.xpath('//sd-cell-col[@data-cy="energy-consumption"]/p[2]/text()').strip()
-        # '71,30'
-        heating_demand_value_text = heating_demand_text.split()[0]
-        num_str = heating_demand_value_text.replace(".", "").replace(",", ".")
-        energy_class = energy_info_tag.xpath('//sd-cell-col[@data-cy="energy-class"]/p[2]/text()').get().strip()
-        return EnergyData(energy_class=energy_class, value=float(num_str))
+        heating_demand_text = energy_info_tag.xpath('//sd-cell-col[@data-cy="energy-consumption"]/p[2]/text()').get()
+        if heating_demand_text is not None:
+            # '71,30'
+            heating_demand_value_text = heating_demand_text.strip().split()[0]
+            num_str = heating_demand_value_text.replace(".", "").replace(",", ".")
+            energy_class = energy_info_tag.xpath('//sd-cell-col[@data-cy="energy-class"]/p[2]/text()').get()
+            return EnergyData(energy_class=energy_class, value=float(num_str))
+        return None
 
     @property
     def energy_efficiency(self) -> Optional[EnergyData]:
@@ -240,12 +242,22 @@ class ImmoweltDeRealEstatePage(RealEstatePage):
         if len(energy_info_selection) == 0:
             return None
         energy_info_tag = energy_info_selection[0]
-        # '01.08.2018 bis 31.07.2028'
-        validity_date_text = (
-            energy_info_tag.xpath('//sd-cell-col[@data-cy="energy-validity"]/p[2]/text()').get().strip()
-        )
-        start_date_str = validity_date_text.split(" bis ")[0]
-        return datetime.strptime(start_date_str, "%d.%m.%Y")
+        validity_date_text: Optional[str] = energy_info_tag.xpath(
+            '//sd-cell-col[@data-cy="energy-validity"]/p[2]/text()'
+        ).get()
+        if validity_date_text is not None:
+            validity_date_text = validity_date_text.strip()
+            if validity_date_text.startswith("bis"):
+                # case: 'bis 28.10.2021'
+                return None
+            if validity_date_text.startswith("seit"):
+                # case: 'seit 28.10.2021'
+                start_year = validity_date_text.split()[1]
+            else:
+                # case: '01.08.2018 bis 31.07.2028'
+                start_year = validity_date_text.split()[0]
+            return datetime.strptime(start_year, "%d.%m.%Y")
+        return None
 
     @property
     def date_of_building(self) -> Optional[datetime]:
@@ -254,10 +266,11 @@ class ImmoweltDeRealEstatePage(RealEstatePage):
             return None
         energy_info_tag = energy_info_selection[0]
         # '2000'
-        date_text = (
-            energy_info_tag.xpath('//sd-cell-col[@data-cy="energy-yearofmodernization"]/p[2]/text()').get().strip()
-        )
-        return datetime.strptime(date_text, "%Y")
+        date_text = energy_info_tag.xpath('//sd-cell-col[@data-cy="energy-yearofmodernization"]/p[2]/text()').get()
+        if date_text is not None and self.fmtckr.contains_number(date_text):
+            year_str = self.fmtckr.extract_year(date_text)
+            return datetime(int(year_str), 1, 1)
+        return None
 
     @property
     def object_type(self) -> str:
