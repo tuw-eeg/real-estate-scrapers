@@ -206,12 +206,12 @@ class ImmoweltAtRealEstatePage(RealEstatePage):
 
     @property
     def epc_pdf_url(self) -> Optional[str]:
-        # No EPC data available on Immowelt
+        # Not available
         return None
 
     @property
     def epc_issued_date(self) -> Optional[datetime]:
-        # No EPC data available on Immowelt
+        # Not available
         return None
 
     @property
