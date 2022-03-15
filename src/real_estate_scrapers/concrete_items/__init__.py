@@ -14,7 +14,7 @@ from web_poet import WebPage  # type: ignore
 
 from real_estate_scrapers.items import RealEstateListPage, RealEstatePage
 
-_start_urls: List[str] = []
+_start_url_dict: Dict[Type[RealEstateListPage], List[str]] = {}
 _scrapy_poet_overrides: Dict[str, Dict[Type[WebPage], Type[WebPage]]] = {}
 
 _dirpath = Path(__file__).parent
@@ -37,7 +37,7 @@ for module_info in pkgutil.iter_modules([str(_dirpath)]):
         RealEstateListPage: list_page_class,
         RealEstatePage: page_class,
     }
-    _start_urls = _start_urls + list_page_class.start_urls()
+    _start_url_dict[list_page_class] = list_page_class.start_urls()
 
 
 def get_scrapy_poet_overrides() -> Dict[str, Dict[Type[WebPage], Type[WebPage]]]:
@@ -53,4 +53,11 @@ def get_start_urls() -> List[str]:
     """
     Returns: The start urls for the scrapy crawler.
     """
-    return _start_urls
+    return [url for url_list in _start_url_dict.values() for url in url_list]
+
+
+def get_start_url_dict() -> Dict[Type[RealEstateListPage], List[str]]:
+    """
+    Returns: The start urls for the scrapy crawler, grouped by subclasses of ``RealEstateListPage``.
+    """
+    return _start_url_dict

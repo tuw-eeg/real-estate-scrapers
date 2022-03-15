@@ -1,10 +1,15 @@
 # pylint: disable-all
 # type: ignore
+from shutil import which
 
 BOT_NAME = "real_estate_scrapers"
 
 SPIDER_MODULES = ["real_estate_scrapers.spiders"]
 NEWSPIDER_MODULE = "real_estate_scrapers.spiders"
+
+SELENIUM_DRIVER_NAME = "chrome"
+SELENIUM_DRIVER_EXECUTABLE_PATH = which("chromedriver")
+SELENIUM_DRIVER_ARGUMENTS = ["--headless", "--no-sandbox", "--disable-gpu"]
 
 # Ignore robots.txt rules
 ROBOTSTXT_OBEY = False
@@ -13,6 +18,8 @@ DOWNLOADER_MIDDLEWARES = {
     # Enabling scrapy_poet downloader middleware so that
     # the ``page`` kwargs get injected into the ``parse`` method automatically
     "scrapy_poet.InjectionMiddleware": 543,
+    # Use SeleniumMiddleware to handle JavaScript
+    "scrapy_selenium.SeleniumMiddleware": 800,
 }
 
 ITEM_PIPELINES = {
@@ -53,7 +60,7 @@ CONCURRENT_REQUESTS = 64
 
 AUTOTHROTTLE_ENABLED = True
 # The initial download delay
-AUTOTHROTTLE_START_DELAY = 2
+AUTOTHROTTLE_START_DELAY = 0.5
 # The maximum download delay to be set in case of high latencies
 AUTOTHROTTLE_MAX_DELAY = 60
 # The average number of requests Scrapy should be sending in parallel to

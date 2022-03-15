@@ -1,11 +1,12 @@
 """Real Estate Spider to handle the actual crawling of various websites"""
-from typing import Any, Dict, Generator, List, Optional
+from typing import Any, Dict, Generator, Optional
 
 import scrapy  # type: ignore
+import scrapy_selenium  # type: ignore
 from loguru import logger
 from scrapy_poet import callback_for  # type: ignore
 
-from real_estate_scrapers.concrete_items import get_scrapy_poet_overrides, get_start_urls
+from real_estate_scrapers.concrete_items import get_scrapy_poet_overrides, get_start_url_dict
 from real_estate_scrapers.items import RealEstateListPage, RealEstatePage
 
 
@@ -13,7 +14,6 @@ class RealEstateSpider(scrapy.Spider):  # type: ignore
     """Real Estate Spider to handle the actual crawling of various websites"""
 
     name = "real_estate_spider"
-    all_urls: List[str] = get_start_urls()
     custom_settings = {"SCRAPY_POET_OVERRIDES": get_scrapy_poet_overrides()}
 
     def __init__(self, only_domain: Optional[str] = None, **kwargs: Dict[str, Any]) -> None:
@@ -28,12 +28,18 @@ class RealEstateSpider(scrapy.Spider):  # type: ignore
         super().__init__(**kwargs)
 
     def start_requests(self) -> Generator[scrapy.Request, None, None]:
-        urls_to_consider: List[str] = RealEstateSpider.all_urls
-        if self.only_domain is not None:
-            logger.debug(f"Only crawling pages from {self.only_domain}")
-            urls_to_consider = [url for url in urls_to_consider if self.only_domain in url]
-        for url in urls_to_consider:
-            yield scrapy.Request(url, callback=self.parse)
+        for page_cls, urls in get_start_url_dict().items():
+            urls_to_consider = [*urls]
+            if self.only_domain is not None:
+                logger.debug(f"Only crawling pages from {self.only_domain}")
+                urls_to_consider = [url for url in urls_to_consider if page_cls.domain() == self.only_domain]
+            for url in urls_to_consider:
+                if page_cls.should_use_selenium():
+                    logger.debug(f"Using selenium for {page_cls.__name__} - {url}")
+                    yield scrapy_selenium.SeleniumRequest(url=url, callback=self.parse)
+                else:
+                    logger.debug(f"Using plain request for {page_cls.__name__} - {url}")
+                    yield scrapy.Request(url=url, callback=self.parse)
 
     def parse(self, response, page: RealEstateListPage):  # type: ignore
         for url in page.real_estate_urls:

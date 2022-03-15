@@ -21,6 +21,14 @@ class RealEstateListPage(WebPage):  # type: ignore
     """Page Object Model for Real Estate List Pages"""
 
     @staticmethod
+    def should_use_selenium() -> bool:
+        """
+        Returns: ``True`` if the page should be scraped
+                 using Selenium.
+        """
+        return False
+
+    @staticmethod
     def domain() -> str:
         """
         Returns: The base domain of the website
