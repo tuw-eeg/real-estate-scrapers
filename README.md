@@ -5,7 +5,38 @@ to scrape data from the web, in combination with [web-poet](https://web-poet.rea
 and [scrapy-poet](https://scrapy-poet.readthedocs.io/en/stable/) to decouple the scraping logic (the HTML structure of
 different real estate websites) abd the spider logic (the logic to collect the data).
 
-## Installation
+## Docker Setup
+
+Configure the environment variables to be used by the Docker services:
+
+```shell
+cp .env.example .env
+```
+
+You can either continue with the default variable values, or modify them to your liking.
+
+Build the images using `docker-compose`:
+
+```shell
+docker-compose build
+```
+
+Start the services:
+
+```shell
+docker-compose up db -d && docker-compose run --rm scraper bash
+```
+
+A Bash session inside the container will be opened, in which you can interact with the `scrapy` project. For example, to
+start the scraper on all support websites, you can execute the following command:
+
+```shell
+scrapy crawl real_estate_spider
+```
+
+## Local Development Setup
+
+### Installation
 
 This project uses [Poetry](https://python-poetry.org/) to manage Python packaging and dependencies. To install `poetry`
 itself, please refer to the [official docs](https://python-poetry.org/docs/#installation).
@@ -16,7 +47,7 @@ Kindly install the dependencies using the following command:
 $ poetry install
 ```
 
-## Configuration
+### Configuration
 
 In order to persist the scraped items into a PostgreSQL database, please create `src/db.cfg` with the following
 contents:
@@ -41,7 +72,7 @@ ITEM_PIPELINES = {
 }
 ```
 
-## Usage
+### Usage
 
 As this package is a valid Scrapy project at its core, you can use it as you would use any other Scrapy project.
 

@@ -1,0 +1,31 @@
+version: "3.9"
+
+volumes:
+  db-data:
+
+networks:
+  db-scraper:
+
+services:
+  db:
+    image: postgres:14.2-alpine
+    container_name: postgres-db
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "15432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      db-scraper:
+
+  scraper:
+    build:
+      context: ./
+      target: app
+    container_name: scraper-app
+    env_file:
+      - .env
+    networks:
+      db-scraper:
