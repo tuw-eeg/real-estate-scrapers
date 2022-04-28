@@ -19,6 +19,16 @@ class DBConfig(NamedTuple):
     user: str
     password: str
 
+    def __repr__(self) -> str:
+        return (
+            f"DBConfig("
+            f"database={self.database}, "
+            f"host={self.host}, "
+            f"port={self.port}, "
+            f"user={self.user}, "
+            f"password={len(self.password) * '*'})"
+        )
+
 
 class DBConfigProvider(ABC):
     """
@@ -180,4 +190,5 @@ def get_database_url(config_path: Optional[Path] = DEFAULT_PATH) -> str:
     Returns: The database URL.
     """
     db_config = get_db_config(config_path)
+    logger.debug(f"Loaded database configuration: {db_config}")
     return _create_database_url_from_config(db_config)

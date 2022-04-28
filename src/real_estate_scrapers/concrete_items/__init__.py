@@ -10,6 +10,7 @@ import pkgutil
 from pathlib import Path
 from typing import Dict, List, Type
 
+from loguru import logger
 from web_poet import WebPage  # type: ignore
 
 from real_estate_scrapers.items import RealEstateListPage, RealEstatePage
@@ -31,13 +32,19 @@ for module_info in pkgutil.iter_modules([str(_dirpath)]):
     # Extract classes
     classes = inspect.getmembers(module, inspect.isclass)
     # Filter for the needed subclasses
-    list_page_class = [cls for _, cls in classes if issubclass(cls, RealEstateListPage)][0]
-    page_class = [cls for _, cls in classes if issubclass(cls, RealEstatePage)][0]
+    list_page_class = [
+        cls for _, cls in classes if issubclass(cls, RealEstateListPage) and cls is not RealEstateListPage
+    ][0]
+    page_class = [cls for _, cls in classes if issubclass(cls, RealEstatePage) and cls is not RealEstatePage][0]
+    logger.debug(
+        f"Found concrete implementations in {full_module_name}: " f"{list_page_class.__name__}, {page_class.__name__}"
+    )
     _scrapy_poet_overrides[list_page_class.domain()] = {
         RealEstateListPage: list_page_class,
         RealEstatePage: page_class,
     }
     _start_url_dict[list_page_class] = list_page_class.start_urls()
+    logger.info(f"Loaded {full_module_name} for {list_page_class.domain()}")
 
 
 def get_scrapy_poet_overrides() -> Dict[str, Dict[Type[WebPage], Type[WebPage]]]:
