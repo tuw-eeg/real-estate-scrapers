@@ -2,17 +2,20 @@
 # type: ignore
 from shutil import which
 
+from fake_useragent import UserAgent
+
 BOT_NAME = "real_estate_scrapers"
 
 SPIDER_MODULES = ["real_estate_scrapers.spiders"]
 NEWSPIDER_MODULE = "real_estate_scrapers.spiders"
 
-SELENIUM_DRIVER_NAME = "chrome"
-SELENIUM_DRIVER_EXECUTABLE_PATH = which("chromedriver")
-SELENIUM_DRIVER_ARGUMENTS = ["--headless", "--no-sandbox", "--disable-gpu"]
-
 # Ignore robots.txt rules
 ROBOTSTXT_OBEY = False
+USER_AGENT = UserAgent(verify_ssl=False).chrome
+
+SELENIUM_DRIVER_NAME = "firefox"
+SELENIUM_DRIVER_EXECUTABLE_PATH = which("geckodriver")
+SELENIUM_DRIVER_ARGUMENTS = ["-headless"]
 
 DOWNLOADER_MIDDLEWARES = {
     # Enabling scrapy_poet downloader middleware so that

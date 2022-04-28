@@ -29,3 +29,15 @@ services:
       - .env
     networks:
       db-scraper:
+
+  scraper-dev:
+    build:
+      context: ./
+      target: app_deps
+    container_name: scraper-app-dev
+    env_file:
+      - .env
+    volumes:
+      - ./src/:/usr/src/app
+    networks:
+      db-scraper:
