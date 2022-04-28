@@ -39,16 +39,15 @@ class RealEstateListPage(WebPage):  # type: ignore
     @staticmethod
     def start_urls() -> List[str]:
         """
-        Returns: The urls of the website
-        from which ``RealEstatePage``s are scraped
+        Returns: The urls of the website from which ``RealEstatePage``s are scraped. Must be absolute urls.
         """
         raise NotImplementedError
 
     @property
     def real_estate_urls(self) -> List[str]:
         """
-        Returns: A list of urls to be used
-                 to scrape ``RealEstatePage`` objects
+        Returns: A list of urls to be used to scrape ``RealEstatePage`` objects.
+                 Must be absolute urls if ``should_use_selenium`` is true.
         """
         raise NotImplementedError
 

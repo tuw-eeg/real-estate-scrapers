@@ -43,4 +43,11 @@ class RealEstateSpider(scrapy.Spider):  # type: ignore
 
     def parse(self, response, page: RealEstateListPage):  # type: ignore
         for url in page.real_estate_urls:
-            yield response.follow(url, callback_for(RealEstatePage))
+            if page.should_use_selenium():
+                # Only works with absolute URLs
+                logger.debug(f"Using selenium for {page.__class__.__name__} - {url}")
+                yield scrapy_selenium.SeleniumRequest(url=url, callback=callback_for(RealEstatePage))
+            else:
+                # Works with relative URLs too
+                logger.debug(f"Using plain request for {page.__class__.__name__} - {url}")
+                yield response.follow(url, callback_for(RealEstatePage))
