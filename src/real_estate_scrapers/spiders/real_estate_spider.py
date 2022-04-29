@@ -20,6 +20,7 @@ class RealEstateSpider(scrapy.Spider):  # type: ignore
     def __init__(self, only_domain: Optional[str] = None, **kwargs: Dict[str, Any]) -> None:
         """
         Initialize the spider.
+
         Args:
             only_domain: A string optionally passed as ``-a only_domain=<domain>`` via the CLI. If set, the spider
                          will only crawl pages from the specified domain.
@@ -56,6 +57,7 @@ class RealEstateSpider(scrapy.Spider):  # type: ignore
         Args:
             response: the response for a request yielded by ``start_requests``.
             page: the ``RealEstateHomePage`` object into which the response was injected.
+
         Returns: a generator of requests to parse ``RealEstateListPage``s.
 
         """
@@ -69,7 +71,7 @@ class RealEstateSpider(scrapy.Spider):  # type: ignore
         """
         Callback to extract urls from a ``RealEstateListPage`` by invoking ``real_estate_urls``.
         Yields requests to parse ``RealEstatePage``s from the extracted urls,
-         which will be the actual items we are collecting.
+        which will be the actual items we are collecting.
 
         Args:
             response: the response for a request yielded by ``parse_home_page``

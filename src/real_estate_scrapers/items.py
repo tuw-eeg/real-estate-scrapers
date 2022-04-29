@@ -18,7 +18,7 @@ from real_estate_scrapers.models import (
 
 
 class RealEstateHomePage(WebPage):  # type: ignore
-    """Page Object Model for Real Estate Home Pages, from which ``RealEstateListPage``s are scraped."""
+    """Page Object Model for Real Estate Home Pages from which urls to ``RealEstateListPage``s are scraped."""
 
     @staticmethod
     def should_use_selenium() -> bool:
@@ -57,7 +57,7 @@ class RealEstateHomePage(WebPage):  # type: ignore
 
 
 class RealEstateListPage(WebPage):  # type: ignore
-    """Page Object Model for Real Estate List Pages"""
+    """Page Object Model for Real Estate List Pages, from which urls pointing to ``RealEstatePage``s are scraped."""
 
     @staticmethod
     def parent_page_type() -> Type[RealEstateHomePage]:
@@ -76,7 +76,10 @@ class RealEstateListPage(WebPage):  # type: ignore
 
 
 class RealEstatePage(ItemWebPage):  # type: ignore
-    """Defines the Page Object Model for Real Estates to be scraped"""
+    """
+    Defines the Page Object Model for Real Estates to be scraped.
+    Items get extracted based on the logic defined in this class.
+    """
 
     # Object to access utility functions
     format_checker = FormatChecker()
@@ -91,8 +94,9 @@ class RealEstatePage(ItemWebPage):  # type: ignore
     @property
     def country(self) -> str:
         """
-        Returns: The ISO 3166-1 alpha-3 country code
-                 of the real estate item's location.
+        Possible values: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3
+
+        Returns: The ISO 3166-1 alpha-3 country code of the real estate item's location.
         """
         raise NotImplementedError
 

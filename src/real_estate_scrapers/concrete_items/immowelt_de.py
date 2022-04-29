@@ -16,7 +16,8 @@ real_estate_type_map = {
 
 class ImmoweltDeRealEstateHomePage(RealEstateHomePage):
     """
-    Home page for https://www.immowelt.de/
+    Entry point for scraping items from https://www.immowelt.de/.
+    Defines how to extract urls pointing to ``ImmoweltDeRealEstateListPage``s.
     """
 
     @staticmethod
@@ -50,8 +51,7 @@ class ImmoweltDeRealEstateHomePage(RealEstateHomePage):
 
 class ImmoweltDeRealEstateListPage(RealEstateListPage):
     """
-    Handles scraping the urls of ``ImmoweltDeRealEstatePage`` objects
-    from https://www.immowelt.de/.
+    Defines how to extract urls pointing to ``ImmoweltDeRealEstatePage``s.
     """
 
     @staticmethod
@@ -65,8 +65,7 @@ class ImmoweltDeRealEstateListPage(RealEstateListPage):
 
 class ImmoweltDeRealEstatePage(RealEstatePage):
     """
-    Handles the scraping of single real estate objects
-    from https://www.immowelt.de/
+    Defines how to extract single real estate objects from https://www.immowelt.de/.
     """
 
     @property

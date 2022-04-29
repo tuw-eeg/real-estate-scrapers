@@ -10,7 +10,8 @@ from real_estate_scrapers.models import EnergyData, ListingType
 
 class TospitimouGrRealEstateHomePage(RealEstateHomePage):
     """
-    Home page for https://en.tospitimou.gr/
+    Entry point for scraping items from https://en.tospitimou.gr/.
+    Defines how to extract urls pointing to ``TospitimouGrRealEstateListPage``s.
     """
 
     @staticmethod
@@ -43,8 +44,7 @@ class TospitimouGrRealEstateHomePage(RealEstateHomePage):
 
 class TospitimouGrRealEstateListPage(RealEstateListPage):
     """
-    Handles scraping the urls of ``TospitimouGrRealEstatePage`` objects
-    from https://en.tospitimou.gr/.
+    Defines how to extract urls pointing to ``TospitimouGrRealEstatePage``s.
     """
 
     @staticmethod
@@ -63,8 +63,7 @@ class TospitimouGrRealEstateListPage(RealEstateListPage):
 
 class TospitimouGrRealEstatePage(RealEstatePage):
     """
-    Handles the scraping of single real estate objects
-    from https://www.immowelt.de/
+    Defines how to extract single real estate objects from https://en.tospitimou.gr/.
     """
 
     @property
