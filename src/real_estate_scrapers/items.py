@@ -1,6 +1,6 @@
 """Defines the Page Object Model for Real Estates to be scraped"""
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Type
 
 from web_poet import ItemWebPage, WebPage  # type: ignore
 
@@ -17,14 +17,14 @@ from real_estate_scrapers.models import (
 )
 
 
-class RealEstateListPage(WebPage):  # type: ignore
-    """Page Object Model for Real Estate List Pages"""
+class RealEstateHomePage(WebPage):  # type: ignore
+    """Page Object Model for Real Estate Home Pages, from which ``RealEstateListPage``s are scraped."""
 
     @staticmethod
     def should_use_selenium() -> bool:
         """
-        Returns: ``True`` if the page should be scraped
-                 using Selenium.
+        Returns: ``True`` if the page should be scraped using Selenium.
+                  Will affect the scraping method of ``RealEstateListPage`` and ``RealEstatePage`` too.
         """
         return False
 
@@ -39,7 +39,30 @@ class RealEstateListPage(WebPage):  # type: ignore
     @staticmethod
     def start_urls() -> List[str]:
         """
-        Returns: The urls of the website from which ``RealEstatePage``s are scraped. Must be absolute urls.
+        Method to specify the initial urls to be processed by ``real_estate_list_urls``.
+
+        Returns: The urls of the website from which urls to ``RealEstateListPage``s are scraped. Must be absolute urls.
+        """
+        raise NotImplementedError
+
+    @property
+    def real_estate_list_urls(self) -> List[str]:
+        """
+        Method to actually parse the home page for the urls of the real estate list pages.
+
+        Returns: A list of urls to be used to scrape ``RealEstateListPage`` objects.
+                 Must be absolute urls if ``should_use_selenium`` is true.
+        """
+        raise NotImplementedError
+
+
+class RealEstateListPage(WebPage):  # type: ignore
+    """Page Object Model for Real Estate List Pages"""
+
+    @staticmethod
+    def parent_page_type() -> Type[RealEstateHomePage]:
+        """
+        Returns: The parent page type (class) of this page object model.
         """
         raise NotImplementedError
 

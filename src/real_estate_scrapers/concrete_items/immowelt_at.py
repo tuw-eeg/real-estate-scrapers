@@ -1,15 +1,47 @@
 """Scraper specification for https://www.immowelt.at/"""
+import itertools
+import re
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Type
 
-from real_estate_scrapers.items import RealEstateListPage, RealEstatePage
+from real_estate_scrapers.items import RealEstateHomePage, RealEstateListPage, RealEstatePage
 from real_estate_scrapers.models import EnergyData, ListingType
 
+# real-estate object types to be scraped
 real_estate_type_map = {
     "haeuser": "Haus",
     "wohnungen": "Wohnung",
     "wohnen-auf-zeit": "Wohnung",
 }
+
+
+class ImmoweltAtRealEstateHomePage(RealEstateHomePage):
+    """
+    Home page for https://www.immowelt.at/
+    """
+
+    @staticmethod
+    def domain() -> str:
+        return "immowelt.at"
+
+    @staticmethod
+    def start_urls() -> List[str]:
+        return ["https://www.immowelt.at/sitemap"]
+
+    @property
+    def real_estate_list_urls(self) -> List[str]:
+        search_hrefs = self.xpath(
+            '//h2[contains(text(), "Immobilien in Österreich")]'
+            "/following-sibling::*[position()=1]"
+            '//li/a[contains(@href, "/suche/")]/@href'
+        ).getall()
+        pattern = r"^\/suche\/(\w+)\/\w+$"
+        places = itertools.chain.from_iterable(re.findall(pattern, href) for href in search_hrefs)
+        objects = real_estate_type_map.keys()
+        listing_links = [f"https://www.immowelt.at/liste/{place}/{obj}" for place in places for obj in objects]
+        # hard-coding pagination for now
+        paginated_links = [f"{link}?cp={page}" for link in listing_links for page in range(2, 201)]
+        return [*listing_links, *paginated_links]
 
 
 class ImmoweltAtRealEstateListPage(RealEstateListPage):
@@ -19,95 +51,12 @@ class ImmoweltAtRealEstateListPage(RealEstateListPage):
     """
 
     @staticmethod
-    def domain() -> str:
-        return "immowelt.at"
-
-    @staticmethod
-    def start_urls() -> List[str]:
-        places = [
-            "amstetten",
-            "ansfelden",
-            "bad-ischl",
-            "bad-voeslau",
-            "baden",
-            "bischofshofen",
-            "braunau-am-inn",
-            "bregenz",
-            "bruck-an-der-mur",
-            "brunn-am-gebirge",
-            "bludenz",
-            "dornbirn",
-            "eisenstadt",
-            "enns",
-            "feldkirch",
-            "feldkirchen-in-kaernten",
-            "gmunden",
-            "goetzis",
-            "graz",
-            "hall-in-tirol",
-            "hallein",
-            "hard",
-            "hohenems",
-            "hollabrunn",
-            "innsbruck",
-            "immobilien?geoid=10306009007",
-            "klagenfurt",
-            "klosterneuburg",
-            "krems-an-der-donau",
-            "kapfenberg",
-            "kufstein",
-            "korneuburg",
-            "leoben",
-            "leonding",
-            "linz",
-            "lienz",
-            "lustenau",
-            "moedling",
-            "marchtrenk",
-            "mistelbach",
-            "neunkirchen",
-            "perchtoldsdorf",
-            "rankweil",
-            "ried-im-innkreis",
-            "salzburg",
-            "saalfelden-am-steinernen-meer",
-            "schwaz",
-            "schwechat",
-            "spittal-an-der-drau",
-            "st-poelten",
-            "st-veit-an-der-glan",
-            "sankt-johann-im-pongau",
-            "steyr",
-            "stockerau",
-            "telfs",
-            "ternitz",
-            "tulln-an-der-donau",
-            "traun-oberoesterreich",
-            "traiskirchen",
-            "villach",
-            "voecklabruck",
-            "voelkermarkt",
-            "waidhofen-an-der-ybbs",
-            "wals-siezenheim",
-            "wels",
-            "wien",
-            "wiener-neustadt",
-            "wolfsberg",
-            "woergl",
-            "zwettl-niederoesterreich",
-        ]
-
-        objects = real_estate_type_map.keys()
-        listing_links = [f"https://www.immowelt.at/liste/{place}/{obj}" for place in places for obj in objects]
-        paginated_links = [f"{link}?cp={page}" for link in listing_links for page in range(2, 201)]
-        return [*listing_links, *paginated_links]
+    def parent_page_type() -> Type[RealEstateHomePage]:
+        return ImmoweltAtRealEstateHomePage
 
     @property
     def real_estate_urls(self) -> List[str]:
-        listing_ids = [
-            tag.attrib["href"].split("/")[-1] for tag in self.css("#listItemWrapperFixed div a[href^='/expose']")
-        ]
-        return [f"https://www.immowelt.at/expose/{listing_id}" for listing_id in listing_ids]
+        return list(self.xpath('//a[starts-with(@href, "https://www.immowelt.at/expose")]/@href').getall())
 
 
 class ImmoweltAtRealEstatePage(RealEstatePage):

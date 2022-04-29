@@ -1,8 +1,10 @@
 """Scraper specification for https://www.immowelt.de/"""
+import itertools
+import re
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Type
 
-from real_estate_scrapers.items import RealEstateListPage, RealEstatePage
+from real_estate_scrapers.items import RealEstateHomePage, RealEstateListPage, RealEstatePage
 from real_estate_scrapers.models import EnergyData, ListingType
 
 real_estate_type_map = {
@@ -12,10 +14,9 @@ real_estate_type_map = {
 }
 
 
-class ImmoweltDeRealEstateListPage(RealEstateListPage):
+class ImmoweltDeRealEstateHomePage(RealEstateHomePage):
     """
-    Handles scraping the urls of ``ImmoweltDeRealEstatePage`` objects
-    from https://www.immowelt.de/.
+    Home page for https://www.immowelt.de/
     """
 
     @staticmethod
@@ -24,122 +25,38 @@ class ImmoweltDeRealEstateListPage(RealEstateListPage):
 
     @staticmethod
     def start_urls() -> List[str]:
-        places = [
-            "berlin",
-            "bielefeld",
-            "bochum",
-            "bonn",
-            "bremen",
-            "dortmund",
-            "dresden",
-            "duisburg",
-            "duesseldorf",
-            "essen",
-            "frankfurt-am-main",
-            "hamburg",
-            "hannover",
-            "koeln",
-            "leipzig",
-            "mannheim",
-            "muenchen",
-            "nuernberg",
-            "stuttgart",
-            "wuppertal",
-            "aachen",
-            "augsburg",
-            "bergisch-gladbach",
-            "bocholt",
-            "bottrop",
-            "braunschweig",
-            "bremerhaven",
-            "chemnitz-sachs",
-            "cottbus",
-            "darmstadt",
-            "dessau",
-            "dueren-rheinl",
-            "erfurt",
-            "erlangen",
-            "esslingen",
-            "flensburg",
-            "freiburg-im-breisgau",
-            "fuerth",
-            "gelsenkirchen",
-            "gera",
-            "giessen-lahn",
-            "goettingen-niedersachs",
-            "guetersloh",
-            "hagen",
-            "halle-saale",
-            "hamm",
-            "hanau",
-            "heidelberg",
-            "heilbronn",
-            "herne",
-            "hildesheim",
-            "ingolstadt",
-            "iserlohn",
-            "jena",
-            "kaiserslautern",
-            "karlsruhe",
-            "kassel",
-            "kiel",
-            "krefeld",
-            "koblenz",
-            "konstanz",
-            "landshut",
-            "leverkusen",
-            "ludwigsburg-wuertt",
-            "ludwigshafen-am-rhein",
-            "luebeck-hansestadt",
-            "luenen",
-            "magdeburg",
-            "mainz",
-            "marburg",
-            "marl-westf",
-            "minden-westf",
-            "moers",
-            "muelheim-an-der-ruhr",
-            "moenchengladbach",
-            "muenster",
-            "neuss",
-            "oberhausen",
-            "offenbach-am-main",
-            "oldenburg-oldenburg",
-            "osnabrueck",
-            "paderborn",
-            "pforzheim",
-            "potsdam",
-            "ratingen",
-            "recklinghausen-westf",
-            "regensburg",
-            "remscheid",
-            "reutlingen",
-            "rosenheim",
-            "rostock",
-            "saarbruecken",
-            "salzgitter",
-            "schwerin",
-            "siegen",
-            "solingen",
-            "straubing",
-            "trier",
-            "tuebingen",
-            "ulm",
-            "velbert",
-            "villingen-schwenningen",
-            "weimar-thuer",
-            "wiesbaden",
-            "wilhelmshaven",
-            "witten",
-            "wolfsburg",
-            "worms",
-            "wuerzburg",
-            "zwickau",
-        ]
+        return ["https://www.immowelt.de/sitemap"]
+
+    @property
+    def real_estate_list_urls(self) -> List[str]:
+        def search_hrefs_for_heading(heading: str) -> List[str]:
+            hrefs: List[str] = self.xpath(
+                f'//h2[contains(text(), "{heading}")]'
+                "/following-sibling::*[position()=1]"
+                '//li/a[contains(@href, "/suche/")]/@href'
+            ).getall()
+            return hrefs
+
+        headings = ["Immobilien nach Bundesland", "Immobilien in Städten", "Wohnungen in Großstädten"]
+        search_hrefs = list(itertools.chain.from_iterable(search_hrefs_for_heading(heading) for heading in headings))
+        pattern = r"(https:\/\/www.immowelt.de)?\/suche\/([\w-]+)\/"
+        places = set(re.findall(pattern, href)[0][1] for href in search_hrefs)
         objects = real_estate_type_map.keys()
         listing_links = [f"https://www.immowelt.de/liste/{place}/{obj}" for place in places for obj in objects]
+        # hard-coding pagination for now
         paginated_links = [f"{link}?sp={page}" for link in listing_links for page in range(2, 201)]
         return [*listing_links, *paginated_links]
+
+
+class ImmoweltDeRealEstateListPage(RealEstateListPage):
+    """
+    Handles scraping the urls of ``ImmoweltDeRealEstatePage`` objects
+    from https://www.immowelt.de/.
+    """
+
+    @staticmethod
+    def parent_page_type() -> Type[RealEstateHomePage]:
+        return ImmoweltDeRealEstateHomePage
 
     @property
     def real_estate_urls(self) -> List[str]:
