@@ -11,7 +11,7 @@ NEWSPIDER_MODULE = "real_estate_scrapers.spiders"
 
 # Ignore robots.txt rules
 ROBOTSTXT_OBEY = False
-USER_AGENT = UserAgent(verify_ssl=False).chrome
+USER_AGENT = UserAgent(verify_ssl=False).firefox
 
 SELENIUM_DRIVER_NAME = "firefox"
 SELENIUM_DRIVER_EXECUTABLE_PATH = which("geckodriver")
@@ -38,10 +38,11 @@ CONCURRENT_REQUESTS = 64
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-# DOWNLOAD_DELAY = 3
+DOWNLOAD_DELAY = 1.0
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN = 16
-# CONCURRENT_REQUESTS_PER_IP = 16
+CONCURRENT_REQUESTS_PER_IP = 16
+DOWNLOAD_TIMEOUT = 30
 
 # Disable cookies (enabled by default)
 # COOKIES_ENABLED = False
