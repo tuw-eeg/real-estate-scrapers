@@ -63,6 +63,10 @@ for module_info in pkgutil.iter_modules([str(_dirpath)]):
     classes = inspect.getmembers(module, inspect.isclass)
 
     home_page_class: Type[RealEstateHomePage] = _get_concrete_class(classes, RealEstateHomePage)
+    if not home_page_class.should_scrape():
+        logger.debug(f"Skipping registration of {home_page_class.domain()}, as ``should_scrape`` returned False.")
+        continue
+
     list_page_class: Type[RealEstateListPage] = _get_concrete_class(classes, RealEstateListPage)
     page_class: Type[RealEstatePage] = _get_concrete_class(classes, RealEstatePage)
     domain_specific_overrides = {

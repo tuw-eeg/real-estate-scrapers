@@ -15,6 +15,11 @@ class TospitimouGrRealEstateHomePage(RealEstateHomePage):
     """
 
     @staticmethod
+    def should_scrape() -> bool:
+        # Ignoring this site for now, as its bot-detection mechanism is too strict
+        return False
+
+    @staticmethod
     def should_use_selenium() -> bool:
         return True
 

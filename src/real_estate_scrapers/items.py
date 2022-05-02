@@ -21,6 +21,16 @@ class RealEstateHomePage(WebPage):  # type: ignore
     """Page Object Model for Real Estate Home Pages from which urls to ``RealEstateListPage``s are scraped."""
 
     @staticmethod
+    def should_scrape() -> bool:
+        """
+        Serves as a switch to turn off scraping for some sites temporarily.
+        This is necessary in cases when the website is not available or has changed.
+
+        Returns: ``True`` if listings should be scraped from this website.
+        """
+        return True
+
+    @staticmethod
     def should_use_selenium() -> bool:
         """
         Returns: ``True`` if the page should be scraped using Selenium.
