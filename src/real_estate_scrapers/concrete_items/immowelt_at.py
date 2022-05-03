@@ -40,9 +40,7 @@ class ImmoweltAtRealEstateHomePage(RealEstateHomePage):
         places = itertools.chain.from_iterable(re.findall(pattern, href) for href in search_hrefs)
         objects = real_estate_type_map.keys()
         listing_links = [f"https://www.immowelt.at/liste/{place}/{obj}" for place in places for obj in objects]
-        # hard-coding pagination for now
-        paginated_links = [f"{link}?cp={page}" for link in listing_links for page in range(2, 201)]
-        return [*listing_links, *paginated_links]
+        return listing_links
 
 
 class ImmoweltAtRealEstateListPage(RealEstateListPage):
@@ -53,6 +51,19 @@ class ImmoweltAtRealEstateListPage(RealEstateListPage):
     @staticmethod
     def parent_page_type() -> Type[RealEstateHomePage]:
         return ImmoweltAtRealEstateHomePage
+
+    @property
+    def real_estate_list_urls_paginated(self) -> List[str]:
+        # "5.123 Wohnungen in Amstetten"
+        match_number_text = self.xpath("//h1[starts-with(@class, 'MatchNumber-')]/text()").get()
+        re_search = re.search(r"\d+(\.\d+)?", match_number_text)
+        if not re_search:
+            raise ValueError(f"Could not extract number of properties from {match_number_text}")
+        num_string: str = re_search.group()
+        match_number = int(num_string.replace(".", ""))
+        items_per_page = 20
+        pages = (match_number // items_per_page) + 1
+        return [f"{self.url}?sp={page}" for page in range(1, pages + 1)]
 
     @property
     def real_estate_urls(self) -> List[str]:
