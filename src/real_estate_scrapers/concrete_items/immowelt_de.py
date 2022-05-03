@@ -59,6 +59,19 @@ class ImmoweltDeRealEstateListPage(RealEstateListPage):
         return ImmoweltDeRealEstateHomePage
 
     @property
+    def real_estate_list_urls_paginated(self) -> List[str]:
+        # "6.123 Wohnungen in Hamburg"
+        match_number_text = self.xpath("//h1[starts-with(@class, 'MatchNumber-')]/text()").get()
+        re_search = re.search(r"\d+(\.\d+)?", match_number_text)
+        if not re_search:
+            raise ValueError(f"Could not extract number of properties from {match_number_text}")
+        num_string: str = re_search.group()
+        match_number = int(num_string.replace(".", ""))
+        items_per_page = 20
+        pages = (match_number // items_per_page) + 1
+        return [f"{self.url}?sp={page}" for page in range(1, pages + 1)]
+
+    @property
     def real_estate_urls(self) -> List[str]:
         return list(self.xpath('//a[starts-with(@href, "https://www.immowelt.de/expose")]/@href').getall())
 
