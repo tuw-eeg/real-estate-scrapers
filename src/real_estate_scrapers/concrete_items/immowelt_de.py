@@ -43,10 +43,7 @@ class ImmoweltDeRealEstateHomePage(RealEstateHomePage):
         pattern = r"(https:\/\/www.immowelt.de)?\/suche\/([\w-]+)\/"
         places = set(re.findall(pattern, href)[0][1] for href in search_hrefs)
         objects = real_estate_type_map.keys()
-        listing_links = [f"https://www.immowelt.de/liste/{place}/{obj}" for place in places for obj in objects]
-        # hard-coding pagination for now
-        paginated_links = [f"{link}?sp={page}" for link in listing_links for page in range(2, 201)]
-        return [*listing_links, *paginated_links]
+        return [f"https://www.immowelt.de/liste/{place}/{obj}" for place in places for obj in objects]
 
 
 class ImmoweltDeRealEstateListPage(RealEstateListPage):
@@ -60,6 +57,9 @@ class ImmoweltDeRealEstateListPage(RealEstateListPage):
 
     @property
     def real_estate_list_urls_paginated(self) -> List[str]:
+        # avoid infinite recursion, do not paginate already paginated pages
+        if "?sp=" in self.url:
+            return []
         # "6.123 Wohnungen in Hamburg"
         match_number_text = self.xpath("//h1[starts-with(@class, 'MatchNumber-')]/text()").get()
         re_search = re.search(r"\d+(\.\d+)?", match_number_text)
