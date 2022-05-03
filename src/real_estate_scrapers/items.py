@@ -1,6 +1,6 @@
 """Defines the Page Object Model for Real Estates to be scraped"""
 from datetime import datetime
-from typing import List, Optional, Type
+from typing import Any, Dict, List, Optional, Type
 
 from web_poet import ItemWebPage, WebPage  # type: ignore
 
@@ -55,6 +55,14 @@ class RealEstateHomePage(WebPage):  # type: ignore
         """
         raise NotImplementedError
 
+    @staticmethod
+    def request_kwargs() -> Dict[str, Any]:
+        """
+        Returns: A dictionary of keyword arguments to be passed to the ``scrapy.Request``
+                instance which will be created when scraping this page.
+        """
+        return {}
+
     @property
     def real_estate_list_urls(self) -> List[str]:
         """
@@ -76,6 +84,25 @@ class RealEstateListPage(WebPage):  # type: ignore
         """
         raise NotImplementedError
 
+    @staticmethod
+    def request_kwargs() -> Dict[str, Any]:
+        """
+        Returns: A dictionary of keyword arguments to be passed to the ``scrapy.Request``
+                instance which will be created when scraping this page.
+        """
+        return {}
+
+    @property
+    def real_estate_list_urls_paginated(self) -> List[str]:
+        """
+        Method to parse a list page for the urls of other list pages
+        by processing the pagination control of the response.
+
+        Returns: A list of urls to be used to scrape ``RealEstateListPage`` objects.
+                 Must be absolute urls if ``should_use_selenium`` is true.
+        """
+        raise NotImplementedError
+
     @property
     def real_estate_urls(self) -> List[str]:
         """
@@ -93,6 +120,14 @@ class RealEstatePage(ItemWebPage):  # type: ignore
 
     # Object to access utility functions
     format_checker = FormatChecker()
+
+    @staticmethod
+    def request_kwargs() -> Dict[str, Any]:
+        """
+        Returns: A dictionary of keyword arguments to be passed to the ``scrapy.Request``
+                instance which will be created when scraping this page.
+        """
+        return {}
 
     @property
     def fmtckr(self) -> FormatChecker:
