@@ -50,7 +50,7 @@ class GreenAcresGrRealEstateHomePage(RealEstateHomePage):
     def real_estate_list_urls(self) -> List[str]:
         # '/property-for-sale/attica'
         hrefs = self.xpath("//li[not(@class)]/a[starts-with(@href, '/property')]/@href").getall()
-        return [f"https://www.green-acres.gr{href}" for href in hrefs]
+        return [f"https://www.{self.domain()}{href}" for href in hrefs]
 
 
 class GreenAcresGrRealEstateListPage(RealEstateListPage):
@@ -77,18 +77,25 @@ class GreenAcresGrRealEstateListPage(RealEstateListPage):
         items_per_page = 24
         pages = (match_number // items_per_page) + 1
         pagination_base_href = self.xpath("//ul[@class='pagination']/li[@class='active']/a/@href").get()
-        return [f"https://www.green-acres.gr{pagination_base_href}?p_n={page}" for page in range(1, pages + 1)]
+        return [
+            f"https://www.{self.parent_page_type().domain()}{pagination_base_href}?p_n={page}"
+            for page in range(1, pages + 1)
+        ]
 
     @property
     def real_estate_urls(self) -> List[str]:
         hrefs = self.xpath("//figure[@class='item-main']/a/@href").getall()
-        return [f"https://www.green-acres.gr{href}" for href in hrefs]
+        return [f"https://www.{self.parent_page_type().domain()}{href}" for href in hrefs]
 
 
 class GreenAcresGrRealEstatePage(RealEstatePage):
     """
     Defines how to extract single real estate objects from https://www.green-acres.gr/.
     """
+
+    @staticmethod
+    def parent_page_type() -> Type[RealEstateListPage]:
+        return GreenAcresGrRealEstateListPage
 
     @property
     def country(self) -> str:
@@ -135,7 +142,10 @@ class GreenAcresGrRealEstatePage(RealEstatePage):
 
     @property
     def heating_demand(self) -> Optional[EnergyData]:
-        data_text: str = self.xpath("//span[@class='icons-text'][text()='PEA']/parent::span/text()").get().strip()
+        data_text: Optional[str] = self.xpath("//span[@class='icons-text'][text()='PEA']/parent::span/text()").get()
+        if data_text is None:
+            return None
+        data_text = data_text.replace("\n", "").strip()
         if data_text == "N/C":
             return None
         return EnergyData(energy_class=data_text, value=None)
@@ -167,6 +177,8 @@ class GreenAcresGrRealEstatePage(RealEstatePage):
     @property
     def object_type(self) -> str:
         # url: https://www.green-acres.gr/en/properties/apartment/athens/Ad2adhezqe41y31v.htm
-        url_segments = self.url.replace("https://www.green-acres.gr/", "").split("/")
+        url_segments = self.url.replace(
+            f"https://www.{self.parent_page_type().parent_page_type().domain()}/", ""
+        ).split("/")
         type_segment: str = url_segments[2]
         return type_segment
