@@ -45,11 +45,15 @@ class RealEstateSpider(scrapy.Spider):  # type: ignore
                 if home_page_cls.should_use_selenium():
                     logger.debug(f"Using selenium for {home_page_cls.__name__} - {url}")
                     yield scrapy_selenium.SeleniumRequest(
-                        url=url, callback=self.parse_home_page, **home_page_cls.request_kwargs()
+                        url=url,
+                        callback=self.parse_home_page,
                     )
                 else:
                     logger.debug(f"Using plain request for {home_page_cls.__name__} - {url}")
-                    yield scrapy.Request(url=url, callback=self.parse_home_page, **home_page_cls.request_kwargs())
+                    yield scrapy.Request(
+                        url=url,
+                        callback=self.parse_home_page,
+                    )
 
     def parse_home_page(self, response: scrapy.http.Response, page: RealEstateHomePage):  # type: ignore
         """
