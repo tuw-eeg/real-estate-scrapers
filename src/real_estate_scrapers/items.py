@@ -77,6 +77,10 @@ class RealEstateHomePage(WebPage):  # type: ignore
 class RealEstateListPage(WebPage):  # type: ignore
     """Page Object Model for Real Estate List Pages, from which urls pointing to ``RealEstatePage``s are scraped."""
 
+    @classmethod
+    def domain(cls) -> str:
+        return cls.parent_page_type().domain()
+
     @staticmethod
     def parent_page_type() -> Type[RealEstateHomePage]:
         """
@@ -120,6 +124,17 @@ class RealEstatePage(ItemWebPage):  # type: ignore
 
     # Object to access utility functions
     format_checker = FormatChecker()
+
+    @classmethod
+    def domain(cls) -> str:
+        return cls.parent_page_type().parent_page_type().domain()
+
+    @staticmethod
+    def parent_page_type() -> Type[RealEstateListPage]:
+        """
+        Returns: The parent page type (class) of this page object model.
+        """
+        raise NotImplementedError
 
     @staticmethod
     def request_kwargs() -> Dict[str, Any]:

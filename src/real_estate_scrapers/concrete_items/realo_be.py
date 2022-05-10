@@ -58,13 +58,17 @@ class RealoBeRealEstateListPage(RealEstateListPage):
     @property
     def real_estate_urls(self) -> List[str]:
         hrefs: List[str] = self.xpath("//li[@data-id='componentEstateListGridItem']/div/@data-href").getall()
-        return [f"https://www.{self.parent_page_type().domain()}{href}" for href in hrefs]
+        return [f"https://www.{self.domain()}{href}" for href in hrefs]
 
 
 class RealoBeRealEstatePage(RealEstatePage):
     """
     Defines how to extract single real estate objects from https://realo.be/.
     """
+
+    @staticmethod
+    def parent_page_type() -> Type[RealEstateListPage]:
+        return RealoBeRealEstateListPage
 
     @property
     def country(self) -> str:
@@ -85,10 +89,10 @@ class RealoBeRealEstatePage(RealEstatePage):
     def zip_code(self) -> str:
         # try and get the ZIP from the url: 'https://www.realo.be/en/7090-braine-le-comte/5207953?l=1626355765'
         # 7090-braine-le-comte
-        segment = self.url.replace("https://www.realo.be/en/", "").split("/")[0]
+        segment = self.url.replace("https://", "").split("/")[2]
         re_search = self.zip_re_search(segment)
         if re_search:
-            zip_string: str = re_search.group(1)
+            zip_string: str = re_search.group()
             return zip_string
         # Fallback to the address line
         # "Stationsstraat 16, 9420 Burst, Erpe-Mere burst"
@@ -98,7 +102,7 @@ class RealoBeRealEstatePage(RealEstatePage):
         re_search = self.zip_re_search(address_text)
         if not re_search:
             raise DropItem(f"Could not extract ZIP from {address_text}")
-        zip_string = re_search.group(1)
+        zip_string = re_search.group()
         return zip_string.strip()
 
     @property
