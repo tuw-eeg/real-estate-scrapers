@@ -34,6 +34,9 @@ class RealEstateSpider(scrapy.Spider):  # type: ignore
         Custom method to supply the spider with start requests from ``RealEstateHomePage`` implementations.
         Yields selenium requests if the ``RealEstateHomePage`` implementation is configured to use selenium.
 
+        - Determined by ``RealEstateHomePage.start_urls``
+        - Chains to ``RealEstateHomePage.real_estate_list_urls``
+
         Returns: a generator of requests to start the spider.
         """
         for home_page_cls, urls in get_start_url_dict().items():
@@ -60,6 +63,9 @@ class RealEstateSpider(scrapy.Spider):  # type: ignore
         Callback to extract urls from a ``RealEstateHomePage`` by invoking ``real_estate_list_urls``.
         Yields requests to parse paginated``RealEstateListPage``s from the extracted urls.
 
+        - Determined by ``RealEstateHomePage.real_estate_list_urls``
+        - Chains to ``RealEstateListPage.real_estate_list_urls_paginated``
+
         Args:
             response: the response for a request yielded by ``start_requests``.
             page: the ``RealEstateHomePage`` object into which the response was injected.
@@ -78,9 +84,12 @@ class RealEstateSpider(scrapy.Spider):  # type: ignore
         Callback to extract paginated ``RealEstateListPage`` urls by invoking ``real_estate_list_urls``.
         Yields requests to parse paginated``RealEstateListPage``s from the extracted urls.
 
+        - Determined by ``RealEstateListPage.real_estate_list_urls_paginated``
+        - Chains to ``RealEstateListPage.real_estate_urls``
+
         Args:
-            response: the response for a request yielded by ``start_requests``.
-            page: the ``RealEstateHomePage`` object into which the response was injected.
+            response: the response for a request yielded by ``parse_home_page``.
+            page: the ``RealEstateListPage`` object into which the response was injected.
 
         Returns: a generator of requests to parse ``RealEstateListPage``s.
 
@@ -97,8 +106,11 @@ class RealEstateSpider(scrapy.Spider):  # type: ignore
         Yields requests to parse ``RealEstatePage``s from the extracted urls,
         which will be the actual items we are collecting.
 
+        - Determined by ``RealEstateListPage.real_estate_urls``
+        - Chains to ``RealEstatePage`` default parsing
+
         Args:
-            response: the response for a request yielded by ``parse_home_page``
+            response: the response for a request yielded by ``parse_pagination``
             page: the ``RealEstateListPage`` object into which the response was injected.
 
         Returns: a generator of requests to parse ``RealEstatePage``s.

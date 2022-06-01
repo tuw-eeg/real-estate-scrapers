@@ -145,6 +145,13 @@ class RealEstatePage(ItemWebPage):  # type: ignore
         return {}
 
     @property
+    def item_url(self) -> Optional[str]:
+        """
+        Returns: An override for the item url. The default scraped url will be used if this returns None.
+        """
+        return None
+
+    @property
     def fmtckr(self) -> FormatChecker:
         """
         Returns: A ``FormatChecker`` object to facilitate raw string checking.
@@ -259,5 +266,5 @@ class RealEstatePage(ItemWebPage):  # type: ignore
                 epc_issued_date=self.epc_issued_date,
             ),
             item_metadata=RealEstateMetadata(date_built=self.date_of_building, type=self.object_type),
-            scrape_metadata=ScrapeMetadata(url=self.url, timestamp=datetime.now().timestamp()),
+            scrape_metadata=ScrapeMetadata(url=self.item_url or self.url, timestamp=datetime.now().timestamp()),
         )
