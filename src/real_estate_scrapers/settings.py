@@ -2,7 +2,7 @@
 # type: ignore
 from shutil import which
 
-from fake_useragent import UserAgent
+# from fake_useragent import UserAgent
 
 BOT_NAME = "real_estate_scrapers"
 
@@ -11,7 +11,7 @@ NEWSPIDER_MODULE = "real_estate_scrapers.spiders"
 
 # Ignore robots.txt rules
 ROBOTSTXT_OBEY = False
-USER_AGENT = UserAgent(verify_ssl=False).firefox
+# USER_AGENT = UserAgent(verify_ssl=False).firefox
 
 SELENIUM_DRIVER_NAME = "firefox"
 SELENIUM_DRIVER_EXECUTABLE_PATH = which("geckodriver")
